@@ -3,13 +3,12 @@
 #include "preset.h"
 #include "gate.h"
 #include "settings.h"
+#include "pins.h"
 
 bool Gate::isSequenceInProgress;
 
 void Gate::init() {
-  dbg("Init Gate..");
   pinMode(PIN_GATE, OUTPUT);
-  dbg("Gate OK");
 };
 
 void Gate::open() {

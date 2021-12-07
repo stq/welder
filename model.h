@@ -21,9 +21,12 @@ class Model {
 public:
     static PresetProperty selectedPresetProperty;
     static bool isPresetSettingsEditMode;
-    static bool isDisplayStatusMode;
+    static bool isIdle;
     static int voltage;
     static int current;
     static bool isCharging;
+
+    static void chooseNextPresetProperty();
+    static void choosePrevPresetProperty();
 
 };

@@ -21,7 +21,7 @@ void tickAll() {
 
   if ((tickCtr % CONTROLLER_TIME_SHARE) == 0) Controller::tick();
 
-  if ((tickCtr % CHARGE_TIME_SHARE) == 0) Charge::tick();
+  if ((tickCtr % CHARGE_TIME_SHARE) == 0) Charger::tick();
 
   if (Gate::isActive()) Gate::tick();
 };

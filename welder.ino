@@ -12,7 +12,7 @@
 void setup() {
   Display::init();
   Settings::init();
-  Charge::init();
+  Charger::init();
   Gate::init();
   Controller::init();
   View::init();

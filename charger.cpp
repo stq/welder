@@ -1,5 +1,8 @@
-#include "display.h"
+#include <Arduino.h>
 #include "charger.h"
+#include "model.h"
+#include "pins.h"
+#include "settings.h"
 
 int             Charger::voltageReading = 0;
 int             Charger::currentReading = 0;
@@ -27,9 +30,9 @@ void Charger::chargeOff() {
 }
 
 void Charger::updateRelay() {
-  Preset *preset = Settings::getCurrentPreset();
+  Preset preset = Settings::getCurrentPreset();
 
-  int expectedLimitVoltageReading = round(COEF_VOLTAGE_DISPLAY_TO_PIN * preset->chargeVoltageLimit);
+  int expectedLimitVoltageReading = round(COEF_VOLTAGE_DISPLAY_TO_PIN * preset.chargeVoltageLimit);
 
   if (voltageReading < expectedLimitVoltageReading - RELAY_HYSTERESIS && !relayOn) chargeOn();
   else if (voltageReading > expectedLimitVoltageReading + RELAY_HYSTERESIS && relayOn) chargeOff();
@@ -38,8 +41,8 @@ void Charger::updateRelay() {
 void Charger::tick() {
   voltageReading = analogRead(PIN_VOLTAGE);
   currentReading = analogRead(PIN_CURRENT);
-  Model.voltage = round(voltageReading * COEF_VOLTAGE_PIN_TO_DISPLAY);
-  Model.current = round(currentReading * COEF_CURRENT_PIN_TO_DISPLAY);
+  Model::voltage = round(voltageReading * COEF_VOLTAGE_PIN_TO_DISPLAY);
+  Model::current = round(currentReading * COEF_CURRENT_PIN_TO_DISPLAY);
   updateRelay();
-  Model.isCharging = relayOn;
+  Model::isCharging = relayOn;
 }

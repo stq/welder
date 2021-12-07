@@ -8,11 +8,8 @@
 
 Preset p;
 
-
 char View::line1[16];
 char View::line2[16];
-byte View::cursorPosX;
-byte View::cursorPosY;
 
 void View::init() {
   tick();
@@ -96,17 +93,17 @@ char *View::getModeString() {
   }
 };
 
-void char *renderVC(int vc) {
+char* View::renderVC(int vc) {
   char buff[5];
   sprintf(buff, "%d02.%d02", vc / 100, vc % 100);
   return buff;
 }
 
 void View::renderBottomLine() {
-  if (isDisplayStatusMode) {
+  if (Model::isIdle) {
     if (!Gate::isActive()) {
-      if (Charge::isCharged) sprintf(line2, "%s [CHARGED]", renderVC(Charge::voltage));
-      else sprintf(line2, "%sv In:sa", renderVC(Charge::voltage), renderVC(Charge::chargeCurrent));
+      if (!Model::isCharging) sprintf(line2, "%s [CHARGED]", View::renderVC(Model::voltage));
+      else sprintf(line2, "%sv In:sa", View::renderVC(Model::voltage), View::renderVC(Model::current));
     } else if (p.isContinous()) {
       sprintf(line2, "On!Push to stop");
     } else {
@@ -118,7 +115,7 @@ void View::renderBottomLine() {
 };
 
 
-void char *renderInterval(unsigned long interval) {
+char* View::renderInterval(unsigned long interval) {
   char ibff[4];
   if (interval < 1000) {
     sprintf(ibff, "%dU", interval);
@@ -147,8 +144,7 @@ void View::renderTopLine() {
       sprintf(tplr, "1)%s 2)%s", renderInterval(p.impulseLength), renderInterval(p.secondImpulseLength));
       return;
     case TripleImpulse:
-      sprintf(tplr, "%s%s%s", renderInterval(p.impulseLength), renderInterval(p.secondImpulseLength),
-              renderInterval(p.thirdImpulseLength));
+      sprintf(tplr, "%s%s%s", renderInterval(p.impulseLength), renderInterval(p.secondImpulseLength), renderInterval(p.thirdImpulseLength));
       return;
     case Burst:
       sprintf(tplr, "%s%s x%d ", renderInterval(p.impulseLength), renderInterval(p.impulseDelay), p.burstLength);
@@ -161,16 +157,15 @@ void View::renderTopLine() {
       return;
   }
 
-  sprintf(line1, "%d:%c %s", Settings::getCurrentPresetIndex(), getModeChar(), splr);
+  char modeChar = getModeChar();
+
+  sprintf(line1, "%d:%c %s", Settings::getCurrentPresetIndex(), modeChar, tplr);
 };
 
 void View::tick() {
   renderBottomLine();
   renderTopLine();
-  out_printLines(line1, line2);
-  if (Model::isPresetSettingsEditMode) {
-    out_focus(0, 0);
-  } else {
-    out_focus(0, 1);
-  }
+  Display::printLines(line1, line2);
+  if (Model::isPresetSettingsEditMode) Display::focus(0, 0);
+  else Display::focus(0, 1);
 };

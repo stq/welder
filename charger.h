@@ -6,7 +6,7 @@
 #define RELAY_HYSTERESIS 10
 #define RELAY_INERTIA 10000
 
-class Charge {
+class Charger {
 private:
     static int voltageReading;
     static int currentReading;

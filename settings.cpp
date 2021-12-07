@@ -15,7 +15,6 @@ void Settings::save() {
   int currentValue;
   EEPROM.get(MEM_ADDR, currentValue);
   if (currentValue != currentPresetIndex) {
-    dbg("SavingSetting");
     //EEPROM.put(MEM_ADDR, currentPresetIndex);
   }
 
@@ -24,9 +23,7 @@ void Settings::save() {
 
 
 void Settings::init() {
-  dbg("Loading Settings");
   load();
-  dbg("CurrPresetInd", currentPresetIndex);
 };
 
 void Settings::load() {

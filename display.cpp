@@ -19,12 +19,7 @@ void Display::dbg(char *msg, int val) {
 }
 
 
-#define CHAR_MODE_1IMP 1
-#define CHAR_MODE_2IMP 2
-#define CHAR_MODE_3IMP 3
-#define CHAR_MODE_BURST 4
-#define CHAR_MODE_MEANDER 5
-#define CHAR_MODE_LINEAR 6
+
 
 void Display::init() {
   lcd = new LiquidCrystal(PIN_LCD_RS, PIN_LCD_E, PIN_LCD_D4, PIN_LCD_D5, PIN_LCD_D6, PIN_LCD_D7);

@@ -40,7 +40,6 @@ void Preset::saveIfChanged(int shift, unsigned long value) { //extends memory ch
   unsigned long currentValue;
   EEPROM.get(shift, currentValue);
   if (currentValue != value) {
-    dbg("SavingPreset");
     EEPROM.put(shift, value);
   }
 }
@@ -76,7 +75,7 @@ bool Preset::isPropertyApplicable(PresetProperty prop) {
   return false;
 };
 
-unsigned long modifyInterval(unsigned long oldVal, int shift, int mul, int minVal, long maxVal) {
+unsigned long modifyInterval(unsigned long val, int shift, int mul, int minVal, long maxVal) {
 
   int baseStep = 1;
   int scale = mul == 1 ? 1 : mul == 2 ? 10 : 100;
@@ -85,25 +84,25 @@ unsigned long modifyInterval(unsigned long oldVal, int shift, int mul, int minVa
     baseStep = 1; //100 mks - 999 mks
   } else if (val < 10000) {
     baseStep = 100; //0.1 ms - 9.9 ms
-    scale = min(mulScale, 10);
+    scale = min(scale, 10);
   } else if (val < 1000000) {
     baseStep = 1000; //1ms - 999ms
   } else if (val < 10000000) {
     baseStep = 100000;//0.1s - 9.9s
-    scale = min(mulScale, 10);
+    scale = min(scale, 10);
   } else {
     baseStep = 1000000;//1s - 999s
   }
 
-  return constrain(oldVal + baseStep * shift * scale, minVal, maxVal);
+  return constrain(val + baseStep * shift * scale, minVal, maxVal);
 }
 
-unsigned long modifyFrequency(unsigned long oldVal, int shift, int mul, int minVal, long maxVal) {
+unsigned long modifyFrequency(unsigned long val, int shift, int mul, int minVal, long maxVal) {
 
   int baseStep = 1;
-  int scale = (int) pow(10, constrain(mul - 1, 0, 6);
+  int scale = (int) pow(10, constrain(mul - 1, 0, 6));
 
-  return constrain(oldVal + baseStep * shift * scale, minVal, maxVal);
+  return constrain(val + baseStep * shift * scale, minVal, maxVal);
 }
 
 

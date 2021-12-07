@@ -69,10 +69,8 @@ int readAuxEncoder() {
 };
 
 void Controller::init() {
-  dbg("Init Controller");
   impulseButton.setType(LOW_PULL);
   mainEncButton.setType(LOW_PULL);
-  dbg("Controller OK");
 };
 
 unsigned long contactCountdown = 0;
@@ -86,7 +84,7 @@ void Controller::tick() {
   preset = Settings::getCurrentPreset();
 
   if (mainEncButton.isPress()) {
-    View::isPresetSettingsEditMode = !View::isPresetSettingsEditMode;
+    Model::isPresetSettingsEditMode = !Model::isPresetSettingsEditMode;
   }
 
   if (mainEncoderPos != 0) {
@@ -101,8 +99,7 @@ void Controller::tick() {
 
   if (auxEncoderPos != 0) {
     if (Model::isPresetSettingsEditMode) {
-      Preset::modify(Model::selectedPresetProperty, auxEncoderPos, auxEncoderMultiplier);
-    } else {
+      preset.modify(Model::selectedPresetProperty, auxEncoderPos, auxEncoderMultiplier);
     }
   }
 

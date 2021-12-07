@@ -13,4 +13,4 @@
 #define PIN_LCD_D7 5
 #define PIN_VOLTAGE A2
 #define PIN_CURRENT A3
-#define PIN_CHARGE_RELAY A4
+#define PIN_CHARGER_RELAY A4
