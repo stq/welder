@@ -1,167 +1,48 @@
+#include <Arduino.h>
 #include "model.h"
-#include "settings.h"
-#include "preset.h"
+#include "storage.h"
 
-bool            Model::isPresetSettingsEditMode = false;
-bool            Model::isIdle = false;
-PresetProperty  Model::selectedPresetProperty = ModeSelector;
+Property Model::property = ModeSelector;
+bool Model::isPropertyMode = false;
+bool Model::isIdle = false;
+int Model::voltage = 0;
+int Model::current = 0;
+bool Model::isCharging = true;
+Preset* Model::preset;
+int Model::presetIndex;
 
+void Model::init(){
+  Storage::from(MODEL_MEM_ADDR);
+  Storage::read(presetIndex);
 
-void Model::chooseNextPresetProperty() {
-  Preset p = Settings::getCurrentPreset();
-  Mode m = p.mode;
-  PresetProperty r;
-  switch (selectedPresetProperty) {
+  presetIndex = constrain(presetIndex, 0, 9);
+  Model::preset = new Preset(presetIndex);
+}
 
-    case ModeSelector:
-      switch (m) {
-        case OneImpulse:
-        case DualImpulse:
-        case TripleImpulse:
-        case Burst:
-          r = ImpulseLength;
-          return;
-        case Meander:
-          r = Frequency;
-          return;
-        case Linear:
-          r = ChargeVoltageLimit;
-          return;
-      }
-    case ImpulseLength:
-      switch (m) {
-        case OneImpulse:
-          r = ChargeVoltageLimit;
-          return;
-        case DualImpulse:
-        case TripleImpulse:
-          r = ImpulseDelay;
-          return;
-        case Burst:
-          r = BurstLength;
-          return;
-      }
-    case ImpulseDelay:
-      switch (m) {
-        case DualImpulse:
-        case TripleImpulse:
-          r = SecondImpulseLength;
-          return;
-        case Burst:
-          r = BurstLength;
-          return;
-      }
-    case SecondImpulseLength:
-      switch (m) {
-        case DualImpulse:
-          r = ChargeVoltageLimit;
-          return;
-        case TripleImpulse:
-          r = SecondImpulseDelay;
-          return;
-      }
-    case SecondImpulseDelay:
-      r = ThirdImpulseLength;
-      return;
-
-    case ThirdImpulseLength:
-    case BurstLength:
-    case Frequency:
-      r = ChargeVoltageLimit;
-      return;
-
-    case ChargeVoltageLimit:
-      r = Cooldown;
-      return;
-
-    case Cooldown:
-      r = EnableContactDetect;
-      return;
-
-    case EnableContactDetect:
-      r = p.enableContactDetect ? ContactDetectDelay : ModeSelector;
-      return;
-
-    case ContactDetectDelay:
-      r = ModeSelector;
-      return;
-  };
-  selectedPresetProperty = r;
+void Model::chooseNextProperty() {
+//  property = preset->getNextProperty(property, false);
 };
 
+void Model::choosePrevProperty() {
+//  property = preset->getNextProperty(property, true);
+};
 
-void Model::choosePrevPresetProperty() {
-  Preset p = Settings::getCurrentPreset();
-  Mode m = p.mode;
-  PresetProperty r;
-  switch (selectedPresetProperty) {
+void Model::chooseNextPreset() {
+  if (presetIndex < PRESETS_NUMBER - 1) {
+    delete Model::preset;
+    presetIndex++;
+    Model::preset = new Preset(presetIndex);
+    Storage::from(MODEL_MEM_ADDR);
+    Storage::write(presetIndex);
+  }
+};
 
-    case ModeSelector:
-      r = p.enableContactDetect ? ContactDetectDelay : EnableContactDetect;
-      return;
-
-    case ImpulseLength:
-      r = ModeSelector;
-      return;
-
-    case ImpulseDelay:
-      r = ImpulseLength;
-      return;
-
-    case SecondImpulseLength:
-      r = ImpulseDelay;
-      return;
-
-    case SecondImpulseDelay:
-      r = SecondImpulseLength;
-      return;
-
-    case ThirdImpulseLength:
-      r = SecondImpulseDelay;
-      return;
-
-    case BurstLength:
-      r = ImpulseDelay;
-      return;
-
-    case Frequency:
-      r = ModeSelector;
-      return;
-
-    case ChargeVoltageLimit:
-      switch (m) {
-        case OneImpulse:
-          r = ImpulseLength;
-          return;
-        case DualImpulse:
-          r = SecondImpulseLength;
-          return;
-        case TripleImpulse:
-          r = ThirdImpulseLength;
-          return;
-        case Burst:
-          r = BurstLength;
-          return;
-        case Meander:
-          r = Frequency;
-          return;
-        case Linear:
-          r = ModeSelector;
-          return;
-      }
-
-    case Cooldown:
-      r = ChargeVoltageLimit;
-      return;
-
-    case EnableContactDetect:
-      r = Cooldown;
-      return;
-
-    case ContactDetectDelay:
-      r = EnableContactDetect;
-      return;
-  };
-
-  selectedPresetProperty = r;
+void Model::choosePrevPreset() {
+  if (presetIndex > 0) {
+    delete Model::preset;
+    presetIndex--;
+    Model::preset = new Preset(presetIndex);
+    Storage::from(MODEL_MEM_ADDR);
+    Storage::write(presetIndex);
+  }
 };

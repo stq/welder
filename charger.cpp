@@ -2,7 +2,6 @@
 #include "charger.h"
 #include "model.h"
 #include "pins.h"
-#include "settings.h"
 
 int             Charger::voltageReading = 0;
 int             Charger::currentReading = 0;
@@ -30,9 +29,7 @@ void Charger::chargeOff() {
 }
 
 void Charger::updateRelay() {
-  Preset preset = Settings::getCurrentPreset();
-
-  int expectedLimitVoltageReading = round(COEF_VOLTAGE_DISPLAY_TO_PIN * preset.chargeVoltageLimit);
+  int expectedLimitVoltageReading = round(COEF_VOLTAGE_DISPLAY_TO_PIN * Model::preset->chargeVoltageLimit);
 
   if (voltageReading < expectedLimitVoltageReading - RELAY_HYSTERESIS && !relayOn) chargeOn();
   else if (voltageReading > expectedLimitVoltageReading + RELAY_HYSTERESIS && relayOn) chargeOff();

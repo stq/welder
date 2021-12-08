@@ -3,9 +3,10 @@
 #include "display.h"
 #include "pins.h"
 #include "preset.h"
+#include "model.h"
 #include "controller.h"
-#include "settings.h"
 #include "gate.h"
+#include "charger.h"
 
 GButton impulseButton(13);
 GButton mainEncButton(11);
@@ -71,41 +72,43 @@ int readAuxEncoder() {
 void Controller::init() {
   impulseButton.setType(LOW_PULL);
   mainEncButton.setType(LOW_PULL);
+  Charger::init();
+  Gate::init();
 };
 
 unsigned long contactCountdown = 0;
-Preset preset;
 
 void Controller::tick() {
+  Preset* p = Model::preset;
+
   readModeEncoder();
   readAuxEncoder();
   impulseButton.tick();
   mainEncButton.tick();
-  preset = Settings::getCurrentPreset();
 
   if (mainEncButton.isPress()) {
-    Model::isPresetSettingsEditMode = !Model::isPresetSettingsEditMode;
+    Model::isPropertyMode = !Model::isPropertyMode;
   }
 
   if (mainEncoderPos != 0) {
-    if (Model::isPresetSettingsEditMode) {
-      if (mainEncoderPos > 0) Model::chooseNextPresetProperty();
-      else Model::choosePrevPresetProperty();
+    if (Model::isPropertyMode) {
+      if (mainEncoderPos > 0) Model::chooseNextProperty();
+      else Model::choosePrevProperty();
     } else {
-      if (mainEncoderPos > 0) Settings::chooseNextPreset();
-      else Settings::choosePrevPreset();
+      if (mainEncoderPos > 0) Model::chooseNextPreset();
+      else Model::choosePrevPreset();
     }
   }
 
   if (auxEncoderPos != 0) {
-    if (Model::isPresetSettingsEditMode) {
-      preset.modify(Model::selectedPresetProperty, auxEncoderPos, auxEncoderMultiplier);
+    if (Model::isPropertyMode) {
+      p->modify(Model::property, auxEncoderPos, auxEncoderMultiplier);
     }
   }
 
 
-  if (isContact && preset.enableContactDetect && !preset.isContinous())
-    contactCountdown = millis() + preset.contactDetectDelay;
+  if (isContact && p->enableContactDetect && !p->isContinous())
+    contactCountdown = millis() + p->contactDetectDelay;
 
   if (contactCountdown != 0 && contactCountdown < millis()) {
     impulseButtonPressed = true;
@@ -113,7 +116,7 @@ void Controller::tick() {
   }
 
   if (impulseButtonPressed) {
-    if (preset.isContinous()) {
+    if (p->isContinous()) {
       if (Gate::isActive()) Gate::cancelSequence();
       else Gate::startSequence();
     } else if (!Gate::isActive()) {
@@ -121,4 +124,7 @@ void Controller::tick() {
     }
     impulseButtonPressed = false;
   }
+
+  Charger::tick();
+  Gate::tick();
 };

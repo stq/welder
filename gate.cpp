@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "display.h"
 #include "preset.h"
+#include "model.h"
 #include "gate.h"
-#include "settings.h"
 #include "pins.h"
 
 bool Gate::isSequenceInProgress;
@@ -49,37 +49,37 @@ bool Gate::isActive() {
 void Gate::startSequence() {
   if (isSequenceInProgress) return;
 
-  Preset preset;// = Settings.getCurrentPreset();
+  Preset* p = Model::preset;
 
   isSequenceInProgress = true;
-  switch (preset.mode) {
+  switch (p->mode) {
     case OneImpulse:
-      openFor(preset.impulseLength);
-      waitFor(preset.cooldown);
+      openFor(p->impulseLength);
+      waitFor(p->cooldown);
       finishSequence();
       return;
     case DualImpulse:
-      openFor(preset.impulseLength);
-      waitFor(preset.impulseDelay);
-      openFor(preset.secondImpulseLength);
-      waitFor(preset.cooldown);
+      openFor(p->impulseLength);
+      waitFor(p->impulseDelay);
+      openFor(p->secondImpulseLength);
+      waitFor(p->cooldown);
       finishSequence();
       return;
     case TripleImpulse:
-      openFor(preset.impulseLength);
-      waitFor(preset.impulseDelay);
-      openFor(preset.secondImpulseLength);
-      waitFor(preset.secondImpulseDelay);
-      openFor(preset.thirdImpulseLength);
-      waitFor(preset.cooldown);
+      openFor(p->impulseLength);
+      waitFor(p->impulseDelay);
+      openFor(p->secondImpulseLength);
+      waitFor(p->secondImpulseDelay);
+      openFor(p->thirdImpulseLength);
+      waitFor(p->cooldown);
       finishSequence();
       return;
     case Burst:
-      for (int i = 0; i < preset.burstLength; i++) {
-        openFor(preset.impulseLength);
-        waitFor(preset.impulseDelay);
+      for (int i = 0; i < p->burstLength; i++) {
+        openFor(p->impulseLength);
+        waitFor(p->impulseDelay);
       }
-      waitFor(preset.cooldown);
+      waitFor(p->cooldown);
       finishSequence();
       return;
     case Meander:

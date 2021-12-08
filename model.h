@@ -1,32 +1,25 @@
 #pragma once
-#define MKS *1
-#define MS *1000
-#define S *1000000
+#include "preset.h"
 
-enum Mode {
-    OneImpulse, DualImpulse, TripleImpulse, Burst, Meander, Linear
-};
+#define MODEL_MEM_ADDR 6
+#define PRESETS_NUMBER 10
 
-enum PresetProperty {
-    ModeSelector, //common
-    ImpulseLength, //for 1,2,3 impulses
-    ImpulseDelay, SecondImpulseLength, //for 2,3 impulses and for 1 with repeats
-    SecondImpulseDelay, ThirdImpulseLength, //for 3 impulses
-    BurstLength,//for 1 impulse with specified delay and specified number of repeats
-    Frequency, //for meander mode
-    ChargeVoltageLimit, Cooldown, EnableContactDetect, ContactDetectDelay
-};//common
+
 
 class Model {
 public:
-    static PresetProperty selectedPresetProperty;
-    static bool isPresetSettingsEditMode;
+    static Property property;
+    static bool isPropertyMode;
     static bool isIdle;
     static int voltage;
     static int current;
     static bool isCharging;
+    static Preset* preset;
+    static int presetIndex;
 
-    static void chooseNextPresetProperty();
-    static void choosePrevPresetProperty();
-
+    static void chooseNextProperty();
+    static void choosePrevProperty();
+    static void chooseNextPreset();
+    static void choosePrevPreset();
+    static void init();
 };

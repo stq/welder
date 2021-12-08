@@ -1,13 +1,41 @@
 #pragma once
 
-#include "model.h"
+#define MKS *1
+#define MS *1000
+#define S *1000000
 
 #define SNAPSHOT_SIZE 84
 #define MEM_START 10
 
+enum Mode {
+    OneImpulse, DualImpulse, TripleImpulse, Burst, Meander, Linear
+};
+
+enum Property {
+    ModeSelector,
+    ImpulseLength,
+    ImpulseDelay, SecondImpulseLength,
+    SecondImpulseDelay, ThirdImpulseLength,
+    BurstLength,
+    Frequency,
+    ChargeVoltageLimit, Cooldown, EnableContactDetect, ContactDetectDelay
+};
 
 class Preset {
+private:
+    int index;
+
+    unsigned long modifyInterval(unsigned long val, int shift, int mul, int minVal, long maxVal);
+    unsigned long modifyFrequency(unsigned long val, int shift, int mul, int minVal, long maxVal);
+    void applyConstraints();
+    void saveIfChanged(int shift, unsigned long value);
+    bool isPropertyApplicable(Property prop);
+    void load();
+
 public:
+    Preset(int index);
+    ~Preset();
+
     unsigned long impulseLength = 20000;
     unsigned long impulseDelay = 10000;
     unsigned long secondImpulseLength = 30000;
@@ -21,17 +49,8 @@ public:
     unsigned long contactDetectDelay = 2000;
     Mode mode;
 
-    void modify(PresetProperty property, int shift, int mult);
-
-    void saveIfChanged(int shift, unsigned long value);
-
-    void applyConstraints();
-
-    void load(int index);
-
-    void save(int index);
-
+    Property getNextProperty(Property base, bool backward);
+    void modify(Property property, int shift, int mult);
+    void save();
     bool isContinous();
-
-    bool isPropertyApplicable(PresetProperty prop);
 };
