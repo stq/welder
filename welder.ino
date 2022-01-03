@@ -1,4 +1,5 @@
-#include "display.h"
+#include "global.h"
+
 #include "model.h"
 #include "view.h"
 #include "controller.h"
@@ -10,6 +11,17 @@ void setup() {
 }
 
 void loop() {
-  View::tick();
+  updateView();
   Controller::tick();
+}
+
+
+#define FRAME_RATE 25
+ulong lastViewUpdate = 0;
+void updateView(){
+  ulong now = millis();
+  if( now - lastViewUpdate > 25){
+    View::tick();
+    lastViewUpdate = now;
+  }
 }

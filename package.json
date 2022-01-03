@@ -1,0 +1,23 @@
+{
+  "name": "welder",
+  "version": "1.0.0",
+  "description": "Arduino controller for 3.3-15v supercaps/car battery/etc. impulse welder.",
+  "main": "gen-freq.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stq/welder.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stq/welder/issues"
+  },
+  "homepage": "https://github.com/stq/welder#readme",
+  "dependencies": {
+    "canvas": "^2.8.0",
+    "regression": "^2.0.1"
+  }
+}

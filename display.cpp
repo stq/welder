@@ -1,27 +1,44 @@
 #include <Arduino.h>
+#include "global.h"
 #include "pins.h"
-#include "display.h"
 
 LiquidCrystal *Display::lcd;
 
 void Display::dbg(String msg) {
-  lcd->clear();
-  lcd->print(msg);
-  delay(100);
+    Serial.println(msg);
 }
 
 void Display::dbg(char *msg, int val) {
-  char buff[16];
-  sprintf(buff, "%s:%d", msg, val);
-  lcd->clear();
-  lcd->print(buff);
-  delay(500);
+    Serial.print(msg);
+    Serial.print(' ');
+    Serial.println(val);
 }
 
+void Display::dbg(char *msg, ulong val) {
+    Serial.print(msg);
+    Serial.print(' ');
+    Serial.println(val);
+}
 
+void Display::dbg(char *msg, float val) {
+    Serial.print(msg);
+    Serial.print(' ');
+    Serial.println(val);
+}
 
+void Display::dbg(char *msg, ulong val, ulong val2) {
+    Serial.print(msg);
+    Serial.print(' ');
+    Serial.print(val);
+    Serial.print(' ');
+    Serial.println(val2);
+}
 
 void Display::init() {
+  Serial.begin(9600);
+  Display::dbg("Initialization..");
+
+
   lcd = new LiquidCrystal(PIN_LCD_RS, PIN_LCD_E, PIN_LCD_D4, PIN_LCD_D5, PIN_LCD_D6, PIN_LCD_D7);
   lcd->begin(16, 2);
   lcd->blink();
@@ -42,7 +59,23 @@ void Display::init() {
 }
 
 
+int hash = 0;
+bool checkHash(char* l1, char* l2){
+  int sum = 0;
+  for( int i = 0; i < 16; i++ ){
+    sum += l1[i] + l2[i];
+  }
+  if( hash != sum ) {
+    hash = sum;
+    return false;
+  };
+  return true;
+}
+
+
 void Display::printLines(char *line1, char *line2) {
+  if( checkHash(line1, line2) ) return;
+
   lcd->clear();
   lcd->setCursor(0, 0);
   lcd->print(line1);

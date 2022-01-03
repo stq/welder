@@ -1,5 +1,6 @@
 #include <Arduino.h>
-#include "display.h"
+#include "GyverPWM.h"
+#include "global.h"
 #include "preset.h"
 #include "model.h"
 #include "gate.h"
@@ -19,25 +20,27 @@ void Gate::close() {
   digitalWrite(GATE_PIN, LOW);
 };
 
-void Gate::openFor(unsigned long mks) {
+void Gate::openFor(ulong mks) {
   if (mks <= MAX_MKS_DELAY) {
     digitalWrite(GATE_PIN, HIGH);
     delayMicroseconds(mks);
     digitalWrite(GATE_PIN, LOW);
   } else {
-    unsigned long ms = mks / 1000;
+    ulong ms = mks / 1000;
     digitalWrite(GATE_PIN, HIGH);
     delay(ms);
     digitalWrite(GATE_PIN, LOW);
   }
 };
 
-void Gate::waitFor(unsigned long mks) {
+void Gate::waitFor(ulong mks) {
   if (mks <= MAX_MKS_DELAY) delayMicroseconds(mks);
   else delay(mks / 1000);
 };
 
 void Gate::finishSequence() {
+  PWM_default(PIN_GATE);
+
   isSequenceInProgress = false;
 };
 
@@ -45,6 +48,10 @@ void Gate::finishSequence() {
 bool Gate::isActive() {
   return isSequenceInProgress;
 };
+
+ulong Gate::meander(ulong freq){
+  return PWM_square_D9((float)freq);
+}
 
 void Gate::startSequence() {
   if (isSequenceInProgress) return;
@@ -83,7 +90,7 @@ void Gate::startSequence() {
       finishSequence();
       return;
     case Meander:
-      //todo implement
+      meander(p->frequency);
       return;
     case Linear:
       open();

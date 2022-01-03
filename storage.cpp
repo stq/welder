@@ -1,5 +1,6 @@
 #include <EEPROM.h>
-#include "display.h"
+#include "global.h"
+
 #include "storage.h"
 
 int Storage::position = 0;
@@ -8,9 +9,9 @@ void Storage::from(int initialPosition){
   position = initialPosition;
 };
 
-void Storage::read(unsigned long& value){
+void Storage::read(ulong& value){
   EEPROM.get(position, value);
-  position += sizeof(unsigned long);
+  position += sizeof(ulong);
 };
 
 void Storage::read(int& value){
@@ -18,11 +19,11 @@ void Storage::read(int& value){
   position += sizeof(int);
 };
 
-void Storage::write(unsigned long value){
-  unsigned long currentValue;
+void Storage::write(ulong value){
+  ulong currentValue;
   EEPROM.get(position, currentValue);
   if (currentValue != value) Display::dbg("EEPROM WRITE");//EEPROM.put(shift, value);
-  position += sizeof(unsigned long);
+  position += sizeof(ulong);
 };
 
 void Storage::write(int value){

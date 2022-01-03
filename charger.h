@@ -11,7 +11,7 @@ private:
     static int voltageReading;
     static int currentReading;
     static bool relayOn;
-    static unsigned long lastRelayChangeTimestamp;
+    static ulong lastRelayChangeTimestamp;
 
 public:
 

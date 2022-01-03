@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <GyverButton.h>
-#include "display.h"
+#include "global.h"
 #include "pins.h"
 #include "preset.h"
 #include "model.h"
@@ -10,58 +10,46 @@
 
 GButton impulseButton(13);
 GButton mainEncButton(11);
-bool impulseButtonPressed;
-bool isContact;
-bool isEncoderButtonClick;
-boolean isEncoderButtonLongpress;
-int mainEncoderPos;
-int auxEncoderPos;
+bool impulseButtonPressed = false;
+bool isContact = false;
+bool isEncoderButtonClick = false;
+bool isEncoderButtonLongpress = false;
+int mainEncoderPos = 0;
+int auxEncoderPos = 0;
 
 
-volatile boolean mainState0, mainLastState, mainTurnFlag;
-
+bool mainState0, mainLastState, mainTurnFlag;
 void readModeEncoder() {
   mainState0 = digitalRead(PIN_MODE_ENCODER_A);//todo use bitRead
   if (mainState0 != mainLastState) {
     mainTurnFlag = !mainTurnFlag;
-    if (mainTurnFlag) //todo use bitRead
+    if (mainTurnFlag) {
       mainEncoderPos = (digitalRead(PIN_MODE_ENCODER_B) != mainLastState) ? -1 : 1;
+    }
     mainLastState = mainState0;
   }
 };
 
-volatile boolean auxState0, auxLastState, auxTurnFlag;
-volatile unsigned long lastAuxActiveTime = millis();
-volatile int auxLastDirection;
-volatile unsigned long totalRestTimeInterval;
-volatile unsigned long lastActivityStart;
-#define ACTIVITY_RESET_TIME 1000
-#define ACTIVITY_MULTIPLIER_TIME 1000
-volatile int auxEncoderMultiplier = 1;
+bool auxState0, auxLastState, auxTurnFlag;
+int auxLastDirection;
+ulong auxChangedTimestamp = millis();
+ulong auxChangedInterval;
 
 int readAuxEncoder() {
   auxState0 = bitRead(PIND, PIN_AUX_ENCODER_A);
   if (auxState0 != auxLastState) {
     auxTurnFlag = !auxTurnFlag;
     if (auxTurnFlag) {
-      auxEncoderPos = (bitRead(PIND, PIN_AUX_ENCODER_B) != auxLastState) ? -1 : 1;
+      auxEncoderPos = (bitRead(PIND, PIN_AUX_ENCODER_B) != auxLastState) ? 1 : -1;
 
-      unsigned long now = millis();
+      ulong now = millis();
+      auxChangedInterval = now - auxChangedTimestamp;
+      auxChangedTimestamp = now;
 
       //Reset activity watch if direction was changed
       if (auxEncoderPos != auxLastDirection) {
-        lastActivityStart = now;
+        auxChangedInterval = 1000; 
         auxLastDirection = auxEncoderPos;
-      }
-
-      unsigned long totalRestTimeInterval = now - lastAuxActiveTime;
-      if (totalRestTimeInterval < ACTIVITY_RESET_TIME) {
-
-        int activityTotalTime = now - lastActivityStart;
-        auxEncoderMultiplier = activityTotalTime / ACTIVITY_MULTIPLIER_TIME;
-
-      } else {
-        lastActivityStart = now;
       }
 
     }
@@ -70,19 +58,19 @@ int readAuxEncoder() {
 };
 
 void Controller::init() {
+  attachInterrupt(0, readAuxEncoder, CHANGE);
   impulseButton.setType(LOW_PULL);
   mainEncButton.setType(LOW_PULL);
   Charger::init();
   Gate::init();
 };
 
-unsigned long contactCountdown = 0;
+ulong contactCountdown = 0;
 
 void Controller::tick() {
   Preset* p = Model::preset;
 
   readModeEncoder();
-  readAuxEncoder();
   impulseButton.tick();
   mainEncButton.tick();
 
@@ -91,6 +79,7 @@ void Controller::tick() {
   }
 
   if (mainEncoderPos != 0) {
+
     if (Model::isPropertyMode) {
       if (mainEncoderPos > 0) Model::chooseNextProperty();
       else Model::choosePrevProperty();
@@ -98,14 +87,15 @@ void Controller::tick() {
       if (mainEncoderPos > 0) Model::chooseNextPreset();
       else Model::choosePrevPreset();
     }
+    mainEncoderPos = 0;
   }
 
   if (auxEncoderPos != 0) {
     if (Model::isPropertyMode) {
-      p->modify(Model::property, auxEncoderPos, auxEncoderMultiplier);
+      p->modify(Model::property, auxEncoderPos, auxChangedInterval);
     }
+    auxEncoderPos = 0;
   }
-
 
   if (isContact && p->enableContactDetect && !p->isContinous())
     contactCountdown = millis() + p->contactDetectDelay;

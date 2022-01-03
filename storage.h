@@ -6,9 +6,9 @@ class Storage {
 public:
     static void from(int initialPosition);
 
-    static void read(unsigned long& value);
+    static void read(ulong& value);
     static void read(int& value);
 
-    static void write(unsigned long value);
+    static void write(ulong value);
     static void write(int value);
 };

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "global.h"
 #include "charger.h"
 #include "model.h"
 #include "pins.h"
@@ -6,12 +7,12 @@
 int             Charger::voltageReading = 0;
 int             Charger::currentReading = 0;
 bool            Charger::relayOn = false;
-unsigned long   Charger::lastRelayChangeTimestamp = 0;
+ulong           Charger::lastRelayChangeTimestamp = 0;
 
 void Charger::init() { pinMode(PIN_CHARGER_RELAY, OUTPUT); }
 
 void Charger::chargeOn() {
-  unsigned long now = millis();
+  ulong now = millis();
   if (now - lastRelayChangeTimestamp > RELAY_INERTIA) {
     digitalWrite(PIN_CHARGER_RELAY, HIGH);
     lastRelayChangeTimestamp = now;
@@ -20,7 +21,7 @@ void Charger::chargeOn() {
 }
 
 void Charger::chargeOff() {
-  unsigned long now = millis();
+  ulong now = millis();
   if ((now - lastRelayChangeTimestamp) > RELAY_INERTIA) {
     digitalWrite(PIN_CHARGER_RELAY, LOW);
     lastRelayChangeTimestamp = now;

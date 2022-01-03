@@ -3,6 +3,7 @@
 #define PIN_GATE 9
 #define PIN_MODE_ENCODER_A 10
 #define PIN_MODE_ENCODER_B 12
+#define PIN_MODE_ENCODER_BTN 11
 #define PIN_AUX_ENCODER_A 2
 #define PIN_AUX_ENCODER_B 3
 #define PIN_LCD_RS A1
@@ -14,3 +15,4 @@
 #define PIN_VOLTAGE A2
 #define PIN_CURRENT A3
 #define PIN_CHARGER_RELAY A4
+#define PIN_IMPULSE_BTN 13

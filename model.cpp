@@ -1,9 +1,10 @@
 #include <Arduino.h>
+#include "global.h"
 #include "model.h"
 #include "storage.h"
 
 Property Model::property = ModeSelector;
-bool Model::isPropertyMode = false;
+bool Model::isPropertyMode = true;
 bool Model::isIdle = false;
 int Model::voltage = 0;
 int Model::current = 0;
@@ -20,11 +21,11 @@ void Model::init(){
 }
 
 void Model::chooseNextProperty() {
-//  property = preset->getNextProperty(property, false);
+  property = preset->getNextProperty(property, false);
 };
 
 void Model::choosePrevProperty() {
-//  property = preset->getNextProperty(property, true);
+  property = preset->getNextProperty(property, true);
 };
 
 void Model::chooseNextPreset() {

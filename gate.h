@@ -9,9 +9,9 @@ public:
 
     static void close();
 
-    static void openFor(unsigned long mks);
+    static void openFor(ulong mks);
 
-    static void waitFor(unsigned long mks);
+    static void waitFor(ulong mks);
 
     static void finishSequence();
 
@@ -26,4 +26,6 @@ public:
     static void cancelSequence();
 
     static void tick();
+
+    static ulong meander(ulong freq);
 };

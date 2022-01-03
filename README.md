@@ -12,4 +12,6 @@ run setup.bat
 
 run build.bat
 
+#Other
 
+Detect COM port by `arduino-cli board list`
