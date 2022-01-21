@@ -74,26 +74,24 @@ void Controller::tick() {
   impulseButton.tick();
   mainEncButton.tick();
 
-  if (mainEncButton.isPress()) {
-    Model::isPropertyMode = !Model::isPropertyMode;
-  }
+  bool isEncPress = mainEncButton.isHold();
+
+  Display::dbg(isEncPress ? "1" : "0");
 
   if (mainEncoderPos != 0) {
+    if (mainEncoderPos > 0) Model::chooseNextProperty();
+    else Model::choosePrevProperty();
 
-    if (Model::isPropertyMode) {
-      if (mainEncoderPos > 0) Model::chooseNextProperty();
-      else Model::choosePrevProperty();
-    } else {
-      if (mainEncoderPos > 0) Model::chooseNextPreset();
-      else Model::choosePrevPreset();
-    }
     mainEncoderPos = 0;
   }
 
   if (auxEncoderPos != 0) {
-    if (Model::isPropertyMode) {
-      p->modify(Model::property, auxEncoderPos, auxChangedInterval);
+    p->modify(Model::property, auxEncoderPos, auxChangedInterval, isEncPress);
+
+    if( Model::property == Frequency ) {
+      Gate::meander(p->frequency);
     }
+
     auxEncoderPos = 0;
   }
 

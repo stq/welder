@@ -36,11 +36,27 @@ void Charger::updateRelay() {
   else if (voltageReading > expectedLimitVoltageReading + RELAY_HYSTERESIS && relayOn) chargeOff();
 }
 
+
+#define MAX_HISTORY 200
+int average(int pin, int& cursor, int* history){
+  cursor = (cursor + 1) % MAX_HISTORY;
+  history[cursor] = analogRead(pin);
+  float avg = 0;
+  for( int i = 0; i < MAX_HISTORY; i++ ){
+    avg += (float)history[i];
+  }
+  return round(avg/(float)MAX_HISTORY);
+};
+
+
+int voltageHistory[MAX_HISTORY];
+int voltageCursor = 0;
+int currentHistory[MAX_HISTORY];
+int currentCursor = 0;
 void Charger::tick() {
-  voltageReading = analogRead(PIN_VOLTAGE);
-  currentReading = analogRead(PIN_CURRENT);
-  Model::voltage = round(voltageReading * COEF_VOLTAGE_PIN_TO_DISPLAY);
-  Model::current = round(currentReading * COEF_CURRENT_PIN_TO_DISPLAY);
+  voltageReading = average(PIN_VOLTAGE, voltageCursor, voltageHistory);
+  currentReading = average(PIN_CURRENT, currentCursor, currentHistory);
+
   updateRelay();
   Model::isCharging = relayOn;
 }

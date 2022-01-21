@@ -16,6 +16,7 @@ public:
     static void finishSequence();
 
     static bool isSequenceInProgress;
+    static ulong meanderFrequency;
 
     static void init();
 
@@ -27,5 +28,5 @@ public:
 
     static void tick();
 
-    static ulong meander(ulong freq);
+    static void meander(ulong freq);
 };

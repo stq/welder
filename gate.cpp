@@ -7,6 +7,7 @@
 #include "pins.h"
 
 bool Gate::isSequenceInProgress;
+ulong Gate::meanderFrequency;
 
 void Gate::init() {
   pinMode(PIN_GATE, OUTPUT);
@@ -49,8 +50,8 @@ bool Gate::isActive() {
   return isSequenceInProgress;
 };
 
-ulong Gate::meander(ulong freq){
-  return PWM_square_D9((float)freq);
+void Gate::meander(ulong freq){
+  meanderFrequency = PWM_square_D9((float)freq);
 }
 
 void Gate::startSequence() {

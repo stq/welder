@@ -4,7 +4,6 @@
 #define MS *1000UL
 #define S *1000000UL
 
-#define SNAPSHOT_SIZE 84
 #define MEM_START 10
 
 enum Mode {
@@ -24,14 +23,13 @@ enum Property {
 
 class Preset {
 private:
-    int index;
     void applyConstraints();
     void saveIfChanged(int shift, ulong value);
     bool isPropertyApplicable(Property prop);
     void load();
 
 public:
-    Preset(int index);
+    Preset();
     ~Preset();
 
     ulong impulseLength = 20000;
@@ -48,7 +46,7 @@ public:
     Mode mode;
 
     Property getNextProperty(Property base, bool backward);
-    void modify(Property property, int shift, int mult);
+    void modify(Property property, int shift, int mult, bool slow);
     void save();
     bool isContinous();
 };

@@ -4,8 +4,7 @@
 #include "storage.h"
 #include "gate.h"
 
-Preset::Preset(int _index){
-  index = _index;
+Preset::Preset(){
   load();
 };
 
@@ -14,7 +13,7 @@ Preset::~Preset(){
 };
 
 void Preset::load() {
-  Storage::from(MEM_START + index * SNAPSHOT_SIZE);
+  Storage::from(MEM_START);
   Storage::read(impulseLength);
   Storage::read(impulseDelay);
   Storage::read(secondImpulseLength);
@@ -33,7 +32,7 @@ void Preset::load() {
 };
 
 void Preset::save() {
-  Storage::from(MEM_START + index * SNAPSHOT_SIZE);
+  Storage::from(MEM_START);
   Storage::write(impulseLength);
   Storage::write(impulseDelay);
   Storage::write(secondImpulseLength);
@@ -76,13 +75,13 @@ Property Preset::getNextProperty(Property base, bool backward){
   }
 };
 
-ulong modifyInterval(ulong val, int shift, int interval, ulong minVal, ulong maxVal) {
-  float changeSpeed = 1000.0/interval;
+ulong modifyInterval(ulong val, int shift, int interval, bool slow, ulong minVal, ulong maxVal) {
+  float changeSpeed = slow ? 1 : (1000.0/interval);
   int diff = 0;
 
   if (val < 1000) { //100 mks - 999 mks
     diff = round(shift * 1.0 * changeSpeed * 2.0);
-  } else if (val < 10000) { //0.1 ms - 9.9 ms
+  } else if (val < 10000) { //0.1 ms - 9.9 ms111
     diff = round(shift * 100 * changeSpeed * 0.5);
     if( val + diff < 1000 ) diff = 1000 - val;
   } else if (val < 1000000) { //1ms - 999ms
@@ -114,65 +113,62 @@ ulong modifyInterval(ulong val, int shift, int interval, ulong minVal, ulong max
   return result - (result%base);
 };
 
-ulong modifyFrequency(ulong freq, int shift, int interval) {
-  float speedCoef = 1000.0/(float)interval;
-  Display::dbg("speedCoef", speedCoef);
+ulong modifyFrequency(ulong freq, int shift, int interval, bool slow) {
 
-  float baseFreqDiff = (float)freq*0.001;
-  baseFreqDiff = baseFreqDiff * baseFreqDiff * 0.1;
-  baseFreqDiff = baseFreqDiff < 1 ? 1 : baseFreqDiff;
-  Display::dbg("baseFreqDiff", baseFreqDiff);
+  int iterations = slow ? 1 : min(max(1, round(200.0/(float)interval)), 100);
+  Display::dbg("iterations", iterations);
 
-  float log2approx = (float)(log(freq))/(float)(log(2));
-  Display::dbg("log2approx", log2approx);
+  float result = (float)freq;
 
+  for( int i = 0; i < iterations; i++ ){
 
-  float totalDiff = log2approx * baseFreqDiff * speedCoef;
-  Display::dbg("totalDiff", totalDiff);
+    float diff = result*0.001;
+    diff = diff * diff * 0.1;
+    diff = diff < 1 ? 1 : diff;
+    Display::dbg("diff", diff);
 
-  if( totalDiff < 1 ) totalDiff = 1;
+    if( diff < 1 ) diff = 1;
 
-
-  float result;
-  if( shift < 0 ) {
-    result = (float)freq - totalDiff;
-    if( result < 1.0 ) return 1;
-  } else {
-    result = (float)freq + totalDiff;
-    if( result > 4000000.0 ) return 4000000UL;
+    if( shift < 0 ) {
+      result = result - diff;
+      if( result < 1.0 ) return 1;
+    } else {
+      result = result + diff;
+      if( result > 4000000.0 ) return 4000000UL;
+    }
   }
 
   return (ulong)result;
 };
 
-void Preset::modify(Property property, int shift, int interval) {
+void Preset::modify(Property property, int shift, int interval, bool slow) {
   switch (property) {
-    case ModeSelector: mode = (6 + (int)mode + shift)%6;
-    case ImpulseLength: impulseLength = modifyInterval(impulseLength, shift, interval, 100 MKS, 200 MS); return;
-    case ImpulseDelay: impulseDelay = modifyInterval(impulseDelay, shift, interval, 100 MKS, 999 S); return;
-    case SecondImpulseLength: secondImpulseLength = modifyInterval(secondImpulseLength, shift, interval, 100 MKS, 200 MS); return;
-    case SecondImpulseDelay: secondImpulseDelay = modifyInterval(secondImpulseDelay, shift, interval, 100 MKS, 999 S); return;
-    case ThirdImpulseLength: thirdImpulseLength = modifyInterval(thirdImpulseLength, shift, interval, 100 MKS, 200 MS); return;
-    case Frequency: frequency = modifyFrequency(frequency, shift, interval);return;
-    case BurstLength: burstLength = constrain(burstLength + shift, 1, 100); return;
-    case Cooldown: cooldown = modifyInterval(cooldown, shift, interval, 400 MS, 999 S); return;
-    case ChargeVoltageLimit: chargeVoltageLimit = constrain(chargeVoltageLimit + shift, 33, 150); return;
+    case ModeSelector:    mode = (6 + (int)mode + shift)%6;
+    case ImpulseLength:   impulseLength = modifyInterval(impulseLength, shift, interval, slow, 100 MKS, 200 MS); return;
+    case ImpulseDelay:    impulseDelay = modifyInterval(impulseDelay, shift, interval, slow, 100 MKS, 999 S); return;
+    case SecondImpulseLength:   secondImpulseLength = modifyInterval(secondImpulseLength, shift, interval, slow, 100 MKS, 200 MS); return;
+    case SecondImpulseDelay:    secondImpulseDelay = modifyInterval(secondImpulseDelay, shift, interval, slow, 100 MKS, 999 S); return;
+    case ThirdImpulseLength:    thirdImpulseLength = modifyInterval(thirdImpulseLength, shift, interval, slow, 100 MKS, 200 MS); return;
+    case Frequency:     frequency = modifyFrequency(frequency, shift, interval, slow);return;
+    case BurstLength:   burstLength = constrain(burstLength + shift*(slow ? 1 : 10), 1, 100); return;
+    case Cooldown:      cooldown = modifyInterval(cooldown, shift, interval, slow, 400 MS, 999 S); return;
+    case ChargeVoltageLimit:  chargeVoltageLimit = constrain(chargeVoltageLimit + shift*(slow ? 1 : 10), 33, 150); return;
     case EnableContactDetect: enableContactDetect = !enableContactDetect; return;
-    case ContactDetectDelay: contactDetectDelay = modifyInterval(contactDetectDelay, shift, interval, 100 MS, 999 S); return;
+    case ContactDetectDelay:  contactDetectDelay = modifyInterval(contactDetectDelay, shift, interval, slow, 100 MS, 999 S); return;
   }
 };
 
 void Preset::applyConstraints() {
-  modify(ModeSelector, 0, 1000);
-  modify(ImpulseLength, 0, 1000);
-  modify(ImpulseDelay, 0, 1000);
-  modify(SecondImpulseLength, 0, 1000);
-  modify(SecondImpulseDelay, 0, 1000);
-  modify(ThirdImpulseLength, 0, 1000);
-  modify(BurstLength, 0, 1000);
-  modify(Frequency, 0, 1000);
-  modify(ChargeVoltageLimit, 0, 1000);
-  modify(Cooldown, 0, 1000);
-  modify(EnableContactDetect, 0, 1000);
-  modify(ContactDetectDelay, 0, 1000);
+  modify(ModeSelector,          0, 1000, false);
+  modify(ImpulseLength,         0, 1000, false);
+  modify(ImpulseDelay,          0, 1000, false);
+  modify(SecondImpulseLength,   0, 1000, false);
+  modify(SecondImpulseDelay,    0, 1000, false);
+  modify(ThirdImpulseLength,    0, 1000, false);
+  modify(BurstLength,           0, 1000, false);
+  modify(Frequency,             0, 1000, false);
+  modify(ChargeVoltageLimit,    0, 1000, false);
+  modify(Cooldown,              0, 1000, false);
+  modify(EnableContactDetect,   0, 1000, false);
+  modify(ContactDetectDelay,    0, 1000, false);
 };

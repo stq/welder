@@ -55,7 +55,7 @@ void renderPropertyValue() {
     case SecondImpulseDelay:sprintf(line2, "Delay2: %s", renderInterval(b, p->secondImpulseDelay));return;
     case ThirdImpulseLength:sprintf(line2, "Impulse3: %s", renderInterval(b, p->thirdImpulseLength));return;
     case BurstLength:sprintf(line2, "Amount:%03d", p->burstLength);return;
-    case Frequency:sprintf(line2, "Freq:%07luHz", p->frequency);return;
+    case Frequency:sprintf(line2, "Freq:%07luHz", Gate::meanderFrequency);return;
     case ChargeVoltageLimit:sprintf(line2, "MaxCharge:%sv", renderVC(b, p->chargeVoltageLimit));return;
     case Cooldown:sprintf(line2, "Cooldown: %s", renderInterval(b, p->cooldown));return;
     case EnableContactDetect:sprintf(line2, "Auto Impulse: %s", p->enableContactDetect ? "Yes" : "No");return;
@@ -74,41 +74,23 @@ char getModeChar() {
   }
 };
 
-
-
-
 void renderBottomLine() {
-  char b1[10];
-  char b2[10];
-  if (!Model::isIdle) {
-    renderPropertyValue();
-  } else { 
-    if (Gate::isActive()) {
-      if (Model::preset->isContinous()) sprintf(line2, "[Active]");
-      else sprintf(line2, "Impulse!Wait..");
-    } else {
-      if (!Model::isCharging) sprintf(line2, "%s [CHARGED]", renderVC(b1, Model::voltage));
-      else sprintf(line2, "%sv In:sa", renderVC(b1, Model::voltage), renderVC(b2, Model::current));
-    }
-  }
+  renderPropertyValue();
 };
 
-
 void renderTopLine() {
+  Preset* p = Model::preset;
+
+  char status = Gate::isActive() ? (p->isContinous() ? '!' : 'i') : ' ';
+
+  char b0[20];
   char b1[10];
   char b2[10];
-  char b3[10];
-  char tplr[20];
-  Preset* p = Model::preset;
-  switch (p->mode) {
-    case OneImpulse:    sprintf(tplr, "%s",         renderInterval(b1, p->impulseLength));break;
-    case DualImpulse:   sprintf(tplr, "%s %s", renderInterval(b1, p->impulseLength), renderInterval(b2, p->secondImpulseLength));break;
-    case TripleImpulse: sprintf(tplr, "%s%s%s", renderInterval(b1, p->impulseLength), renderInterval(b2, p->secondImpulseLength), renderInterval(b3, p->thirdImpulseLength));break;
-    case Burst:         sprintf(tplr, "%s%s x%d ", renderInterval(b1, p->impulseLength), renderInterval(b2, p->impulseDelay), p->burstLength);break;
-    case Meander:       sprintf(tplr, "%07luHz", p->frequency);break;
-    case Linear:        sprintf(tplr, "%sv", renderVC(b1,p->chargeVoltageLimit));break;
-  }
-  sprintf(line1, "#%d %c %s", Model::presetIndex, getModeChar(), tplr);
+
+  if (!Model::isCharging) sprintf(b0, "%sv chrged", renderVC(b1, Model::voltage));
+  else sprintf(b0, "%sV ^%sA", renderVC(b1, Model::voltage), renderVC(b2, Model::current));
+
+  sprintf(line1, "%c %c %s", getModeChar(), status, b0);
 
 };
 
@@ -118,7 +100,4 @@ void View::tick() {
   renderBottomLine();
 
   Display::printLines(line1, line2);
-
-  if (Model::isPropertyMode) Display::focus(0, 1);
-  else Display::focus(0, 0);
 };
