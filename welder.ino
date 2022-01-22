@@ -13,6 +13,7 @@ void setup() {
 void loop() {
   updateView();
   Controller::tick();
+  delay(100);
 }
 
 

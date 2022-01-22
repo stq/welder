@@ -87,7 +87,7 @@ void renderTopLine() {
   char b1[10];
   char b2[10];
 
-  if (!Model::isCharging) sprintf(b0, "%sv chrged", renderVC(b1, Model::voltage));
+  if (!Model::isCharging) sprintf(b0, "%svCharged", renderVC(b1, Model::voltage));
   else sprintf(b0, "%sV ^%sA", renderVC(b1, Model::voltage), renderVC(b2, Model::current));
 
   sprintf(line1, "%c %c %s", getModeChar(), status, b0);

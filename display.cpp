@@ -8,12 +8,6 @@ void Display::dbg(String msg) {
     Serial.println(msg);
 }
 
-void Display::dbg(char *msg, int val) {
-    Serial.print(msg);
-    Serial.print(' ');
-    Serial.println(val);
-}
-
 void Display::dbg(char *msg, ulong val) {
     Serial.print(msg);
     Serial.print(' ');
@@ -21,6 +15,12 @@ void Display::dbg(char *msg, ulong val) {
 }
 
 void Display::dbg(char *msg, float val) {
+    Serial.print(msg);
+    Serial.print(' ');
+    Serial.println(val);
+}
+
+void Display::dbg(char *msg, int val) {
     Serial.print(msg);
     Serial.print(' ');
     Serial.println(val);

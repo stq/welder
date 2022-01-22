@@ -1,15 +1,16 @@
 #pragma once
 
-#define COEF_VOLTAGE_PIN_TO_DISPLAY 0.1466275659824047
+#define COEF_VOLTAGE_PIN_TO_DISPLAY 0.25126
+#define COEF_CURRENT_PIN_TO_DISPLAY 0.3333
+#define COEF_CURRENT_PIN_SHIFT 512
 #define COEF_VOLTAGE_DISPLAY_TO_PIN 1.0/COEF_VOLTAGE_PIN_TO_DISPLAY
-#define COEF_CURRENT_PIN_TO_DISPLAY 0.1
-#define RELAY_HYSTERESIS 10
+#define RELAY_HYSTERESIS 0.2
 #define RELAY_INERTIA 10000
 
 class Charger {
 private:
-    static int voltageReading;
-    static int currentReading;
+    static float voltageReading;
+    static float currentReading;
     static bool relayOn;
     static ulong lastRelayChangeTimestamp;
 
