@@ -1,28 +1,25 @@
-#include "global.h"
-
-#include "model.h"
-#include "view.h"
-#include "controller.h"
+#include "src/global.h"
+#include "src/params.h"
+#include "src/model.h"
+#include "src/view.h"
+#include "src/gate.h"
+#include "src/speaker.h"
+#include "src/controller.h"
+//#include "src/health.h"
 
 void setup() {
+//  Health::check();
   Display::init();
-  Model::init();
+  Params::init();
+  Gate::init();
+  Speaker::init();
   Controller::init();
+  View::init();
 }
 
 void loop() {
-  updateView();
   Controller::tick();
-  delay(100);
+  View::tick();
+
 }
 
-
-#define FRAME_RATE 25
-ulong lastViewUpdate = 0;
-void updateView(){
-  ulong now = millis();
-  if( now - lastViewUpdate > 25){
-    View::tick();
-    lastViewUpdate = now;
-  }
-}
