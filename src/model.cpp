@@ -5,19 +5,18 @@
 
 Property  Model::property = Cooldown;
 
-ulong       Model::multiplier = 1;
+int      Model::multiplierLog10 = 1;
 
-bool      Model::isContacted = false;
-bool      Model::isAutoCountdown = false;
-ulong     Model::startAutoCountdownTime = 0UL;
-ulong     Model::remainingAutoCountdownTime = 0UL;
+bool     Model::isAutoCountdown = false;
+long     Model::startAutoCountdownTime = 0L;
+long     Model::remainingAutoCountdownTime = 0L;
 
-ulong     Model::remainingCooldownTime = 0UL;
+long     Model::remainingCooldownTime = 0L;
 
 void Model::chooseNextProperty() {
-  property = Params::getNextProperty(property, false);
+    property = Params::getNextProperty(property, false);
 };
 
 void Model::choosePrevProperty() {
-  property = Params::getNextProperty(property, true);
+    property = Params::getNextProperty(property, true);
 };

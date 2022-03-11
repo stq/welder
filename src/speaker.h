@@ -3,9 +3,7 @@
 class Speaker {
 
 public:
-  static void init();
+    static void init();
 
-
-  static void play(int f, int t);
-
+    static void play(int freq, int time);
 };

@@ -4,187 +4,200 @@
 #include "storage.h"
 #include "gate.h"
 
-ulong Params::impulseLength;
-ulong Params::impulseDelay;
-ulong Params::secondImpulseLength;
-ulong Params::secondImpulseDelay;
-ulong Params::thirdImpulseLength;
-ulong Params::burstImpulseLength;
-ulong Params::burstImpulseDelay;
-ulong Params::burstLength;
-ulong Params::frequency;
-ulong Params::cooldown;
-ulong Params::contactDetectDelay;
+long Params::impulseLength;
+long Params::impulseDelay;
+long Params::secondImpulseLength;
+long Params::secondImpulseDelay;
+long Params::thirdImpulseLength;
+long Params::burstImpulseLength;
+long Params::burstImpulseDelay;
+long Params::burstLength;
+long Params::frequency;
+long Params::cooldown;
+long Params::contactDetectDelay;
 Mode  Params::mode = OneImpulse;
 
 bool Params::isPropertyApplicable(Property prop) {
-  Mode mode = Params::mode;
+    Mode mode = Params::mode;
 
-  if (mode == Meander && prop == Frequency) return true;
-  if (mode == Burst && (prop == BurstImpulseLength || prop == BurstImpulseDelay || prop == BurstLength) ) return true;
+    if (mode == Meander && prop == Frequency) return true;
+    if (mode == Burst && (prop == BurstImpulseLength || prop == BurstImpulseDelay || prop == BurstLength)) return true;
 
-  if ((mode == TripleImpulse || mode == DualImpulse || mode == OneImpulse) && (prop == ImpulseLength || prop == ContactDetectDelay || prop == Cooldown)) return true;
-  if ((mode == TripleImpulse || mode == DualImpulse) && (prop == ImpulseDelay || prop == SecondImpulseLength)) return true;
-  if ( mode == TripleImpulse && (prop == SecondImpulseDelay || prop == ThirdImpulseLength)) return true;
+    if ((mode == TripleImpulse || mode == DualImpulse || mode == OneImpulse) && (prop == ImpulseLength || prop == ContactDetectDelay || prop == Cooldown)) return true;
+    if ((mode == TripleImpulse || mode == DualImpulse) && (prop == ImpulseDelay || prop == SecondImpulseLength)) return true;
+    if (mode == TripleImpulse && (prop == SecondImpulseDelay || prop == ThirdImpulseLength)) return true;
 
-  return false;
+    return false;
 };
+
 void Params::applyConstraints() {
-  modify(ImpulseLength,         0, 1);
-  modify(ImpulseDelay,          0, 1);
-  modify(SecondImpulseLength,   0, 1);
-  modify(SecondImpulseDelay,    0, 1);
-  modify(ThirdImpulseLength,    0, 1);
-  modify(BurstImpulseLength,    0, 1);
-  modify(BurstImpulseDelay,     0, 1);
-  modify(BurstLength,           0, 1);
-  modify(Frequency,             0, 1);
-  modify(Cooldown,              0, 1);
-  modify(ContactDetectDelay,    0, 1);
-  if( (int) mode < 0 || (int) mode >= MODES_AMOUNT ) mode = OneImpulse;
+    modify(ImpulseLength, 0, 1);
+    modify(ImpulseDelay, 0, 1);
+    modify(SecondImpulseLength, 0, 1);
+    modify(SecondImpulseDelay, 0, 1);
+    modify(ThirdImpulseLength, 0, 1);
+    modify(BurstImpulseLength, 0, 1);
+    modify(BurstImpulseDelay, 0, 1);
+    modify(BurstLength, 0, 1);
+    modify(Frequency, 0, 1);
+    modify(Cooldown, 0, 1);
+    modify(ContactDetectDelay, 0, 1);
+    if ((int) mode < 0 || (int) mode >= MODES_AMOUNT) mode = OneImpulse;
 };
+
 void Params::load() {
-  Storage::from(MEM_START);
-  Storage::read(impulseLength);
-  Storage::read(impulseDelay);
-  Storage::read(secondImpulseLength);
-  Storage::read(secondImpulseDelay);
-  Storage::read(thirdImpulseLength);
-  Storage::read(burstImpulseLength);
-  Storage::read(burstImpulseDelay);
-  Storage::read(burstLength);
-  Storage::read(frequency);
-  Storage::read(cooldown);
-  Storage::read(contactDetectDelay);
-  ulong mode_int;
-  Storage::read(mode_int);
-  mode = static_cast<Mode>((int)mode_int);
-  applyConstraints();
+    Storage::from(MEM_START);
+    Storage::read(impulseLength);
+    Storage::read(impulseDelay);
+    Storage::read(secondImpulseLength);
+    Storage::read(secondImpulseDelay);
+    Storage::read(thirdImpulseLength);
+    Storage::read(burstImpulseLength);
+    Storage::read(burstImpulseDelay);
+    Storage::read(burstLength);
+    Storage::read(frequency);
+    Storage::read(cooldown);
+    Storage::read(contactDetectDelay);
+    long mode_int;
+    Storage::read(mode_int);
+    mode = static_cast<Mode>((int) mode_int);
+    applyConstraints();
 };
 
 void Params::save() {
-  Storage::from(MEM_START);
-  Storage::write(impulseLength);
-  Storage::write(impulseDelay);
-  Storage::write(secondImpulseLength);
-  Storage::write(secondImpulseDelay);
-  Storage::write(thirdImpulseLength);
-  Storage::write(burstImpulseLength);
-  Storage::write(burstImpulseDelay);
-  Storage::write(burstLength);
-  Storage::write(frequency);
-  Storage::write(cooldown);
-  Storage::write(contactDetectDelay);
-  Storage::write((ulong)mode);
+    Storage::from(MEM_START);
+    Storage::write(impulseLength);
+    Storage::write(impulseDelay);
+    Storage::write(secondImpulseLength);
+    Storage::write(secondImpulseDelay);
+    Storage::write(thirdImpulseLength);
+    Storage::write(burstImpulseLength);
+    Storage::write(burstImpulseDelay);
+    Storage::write(burstLength);
+    Storage::write(frequency);
+    Storage::write(cooldown);
+    Storage::write(contactDetectDelay);
+    Storage::write((long) mode);
 };
 
 bool Params::isContinous() {
-  return mode == Meander;
+    return mode == Meander;
 };
 
-
-
-Property Params::getNextProperty(Property base, bool backward){
-  int i = (int)base;
-  while(true){
-    i = (i + PROPERTIES_AMOUNT + (backward ? -1 : 1)) % PROPERTIES_AMOUNT;
-    Property nextProperty = static_cast<Property> (i);
-    if(isPropertyApplicable(nextProperty)) return nextProperty;
-  }
-};
-
-ulong modifyCooldownInterval(ulong val, int shift, ulong multiplier) {
-  int scale = multiplier > 1 ? 10 : 100;
-  return constrain( scale*(val/scale) + scale * shift * 1 MS, 10 MS, 9 S);
-};
-
-ulong modifyWelderInterval(ulong val, int shift, int multiplier) {
-  int scale = multiplier > 1 ? 1 : 10;
-  return constrain( scale*(val/scale) + scale * shift * 1 MS, 1 MS, 200 MS);
-};
-
-ulong modifyBurstInterval(ulong val, int shift, int multiplier) {
-  return constrain( val + multiplier * shift, 1 MKS, 1 S);
-};
-
-
-ulong modifyFrequency(ulong freq, int shift, ulong multiplier) {
-
-  if( freq == 4000000UL && shift > 0 || freq == 1UL && shift < 0) return;
-
-  ulong currFreq = freq;
-  for( ulong i = 0; i < multiplier; i++ ){
-
-    for( int f = freq; f>0 && f <= 4000000UL ; f += shift){
-      ulong newFreq = Gate::meander(f);
-      if( newFreq != currFreq ) {
-        currFreq = newFreq;
-        break;
-      }
+Property Params::getNextProperty(Property base, bool backward) {
+    int i = (int) base;
+    while (true) {
+        i = (i + PROPERTIES_AMOUNT + (backward ? -1 : 1)) % PROPERTIES_AMOUNT;
+        Property nextProperty = static_cast<Property> (i);
+        if (isPropertyApplicable(nextProperty)) return nextProperty;
     }
-
-    if( currFreq == 4000000UL || currFreq == 1UL) break;
-  }
-
-  return (ulong)currFreq;
 };
 
-void Params::modify(Property property, int shift, ulong multiplier) {
-  switch (property) {
-    case ImpulseLength:       impulseLength       = modifyWelderInterval(impulseLength,       shift, multiplier); return;
-    case SecondImpulseLength: secondImpulseLength = modifyWelderInterval(secondImpulseLength, shift, multiplier); return;
-    case ThirdImpulseLength:  thirdImpulseLength  = modifyWelderInterval(thirdImpulseLength,  shift, multiplier); return;
+long modifyInterval(long val, int shift, long multiplier) {
+    return constrain(val + multiplier * shift, 1 MKS, 9 S);
+};
 
-    case ImpulseDelay:        impulseDelay        = modifyWelderInterval(impulseDelay,        shift, multiplier); return;
-    case SecondImpulseDelay:  secondImpulseDelay  = modifyWelderInterval(secondImpulseDelay,  shift, multiplier); return;
+long modifyFrequency(long freq, int shift, long multiplier) {
 
-    case Frequency:           frequency = modifyFrequency(frequency, shift, multiplier);return;
+    if (freq == 4000000L && shift > 0 || freq == 1L && shift < 0) return;
 
-    case BurstImpulseLength:  burstImpulseLength = modifyBurstInterval(burstImpulseLength, shift, multiplier); return;
-    case BurstImpulseDelay:   burstImpulseDelay  = modifyBurstInterval(burstImpulseDelay,  shift, multiplier); return;
+    long requestedFreq = freq + shift * multiplier;
 
-    case BurstLength:   burstLength = constrain(burstLength + shift, 1, 1000); return;
+    if( requestedFreq > 4000000L ) requestedFreq = 4000000L;
+    if( requestedFreq < 1L ) requestedFreq = 1L;
 
-    case Cooldown:      cooldown = modifyCooldownInterval(cooldown, shift, multiplier); return;
+    long newFreq = Gate::meander(requestedFreq, true);
 
-    case ContactDetectDelay:  contactDetectDelay = modifyCooldownInterval(contactDetectDelay, shift, multiplier); return;
-  }
+    return  newFreq;
 };
 
 
-
-ulong Params::getValue(Property prop){
-  switch (prop) {
-    case ImpulseLength:         return Params::impulseLength/1000;
-    case ImpulseDelay:          return Params::impulseLength/1000;
-    case SecondImpulseLength:   return Params::secondImpulseLength/1000;
-    case SecondImpulseDelay:    return Params::secondImpulseDelay/1000;
-    case ThirdImpulseLength:    return Params::thirdImpulseLength/1000;
-    case BurstImpulseLength:    return Params::burstImpulseLength;
-    case BurstImpulseDelay:     return Params::burstImpulseDelay;
-    case BurstLength:           return Params::burstLength;
-    case Frequency:             return Params::frequency;
-    case Cooldown:              return Params::cooldown/100000;
-    case ContactDetectDelay:    return Params::contactDetectDelay/100000;
-  }
+long pow10(int n){
+    switch(n) {
+        case 0: return 1L;
+        case 1: return 10L;
+        case 2: return 100L;
+        case 3: return 1000L;
+        case 4: return 10000L;
+        case 5: return 100000L;
+        case 6: return 1000000L;
+    }
 }
 
-ulong Params::getMaxMultiplier(Property prop){
-  switch (prop) {
-    case ImpulseLength:
-    case ImpulseDelay:
-    case SecondImpulseLength:
-    case SecondImpulseDelay:
-    case ThirdImpulseLength:    return 10;
-    case BurstImpulseLength:    return Params::burstImpulseLength;
-    case BurstImpulseDelay:     return Params::burstImpulseDelay;
-    case BurstLength:           return Params::burstLength;
-    case Frequency:             return Params::frequency;
-    case Cooldown:              return Params::cooldown/100000;
-    case ContactDetectDelay:    return Params::contactDetectDelay/100000;
-  }
-}
+void Params::modify(Property property, int shift, int multiplierLog10) {
+    long multiplier = pow10(multiplierLog10-1);
 
-void Params::init() {
-  load();
+    switch (property) {
+        case ImpulseLength:
+            impulseLength = modifyInterval(impulseLength, shift, multiplier);
+            return;
+        case SecondImpulseLength:
+            secondImpulseLength = modifyInterval(secondImpulseLength, shift, multiplier);
+            return;
+        case ThirdImpulseLength:
+            thirdImpulseLength = modifyInterval(thirdImpulseLength, shift, multiplier);
+            return;
+
+        case ImpulseDelay:
+            impulseDelay = modifyInterval(impulseDelay, shift, multiplier);
+            return;
+        case SecondImpulseDelay:
+            secondImpulseDelay = modifyInterval(secondImpulseDelay, shift, multiplier);
+            return;
+
+        case Frequency:
+            frequency = modifyFrequency(frequency, shift, multiplier);
+            return;
+
+        case BurstImpulseLength:
+            burstImpulseLength = modifyInterval(burstImpulseLength, shift, multiplier);
+            return;
+        case BurstImpulseDelay:
+            burstImpulseDelay = modifyInterval(burstImpulseDelay, shift, multiplier);
+            return;
+
+        case BurstLength:
+            burstLength = constrain(burstLength + multiplier * shift, 0, 9999999);
+            return;
+
+        case Cooldown:
+            cooldown = modifyInterval(cooldown, shift, multiplier);
+            return;
+
+        case ContactDetectDelay:
+            contactDetectDelay = modifyInterval(contactDetectDelay, shift, multiplier);
+            return;
+    }
 };
+
+
+long Params::getValue(Property prop) {
+    switch (prop) {
+        case ImpulseLength:
+            return Params::impulseLength;
+        case ImpulseDelay:
+            return Params::impulseLength;
+        case SecondImpulseLength:
+            return Params::secondImpulseLength;
+        case SecondImpulseDelay:
+            return Params::secondImpulseDelay;
+        case ThirdImpulseLength:
+            return Params::thirdImpulseLength;
+        case BurstImpulseLength:
+            return Params::burstImpulseLength;
+        case BurstImpulseDelay:
+            return Params::burstImpulseDelay;
+        case BurstLength:
+            return Params::burstLength;
+        case Frequency:
+            return Params::frequency;
+        case Cooldown:
+            return Params::cooldown;
+        case ContactDetectDelay:
+            return Params::contactDetectDelay;
+    }
+};
+
+bool Params::isWeldingMode() {
+    return mode == OneImpulse || mode == DualImpulse || mode == TripleImpulse;
+}

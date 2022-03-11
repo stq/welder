@@ -6,91 +6,113 @@
 #include "gate.h"
 #include "pins.h"
 
+bool Gate::breakFlag;
 bool Gate::isSequenceInProgress;
-ulong Gate::meanderFrequency;
 
 void Gate::init() {
-  pinMode(PIN_GATE, OUTPUT);
+    pinMode(PIN_GATE, OUTPUT);
 };
 
 void Gate::open() {
-  digitalWrite(GATE_PIN, HIGH);
+    digitalWrite(GATE_PIN, HIGH);
 };
 
 void Gate::close() {
-  digitalWrite(GATE_PIN, LOW);
+    digitalWrite(GATE_PIN, LOW);
 };
 
-void Gate::openFor(ulong mks) {
-  if (mks <= MAX_MKS_DELAY) {
-    digitalWrite(GATE_PIN, HIGH);
-    delayMicroseconds(mks);
-    digitalWrite(GATE_PIN, LOW);
-  } else {
-    ulong ms = mks / 1000;
-    digitalWrite(GATE_PIN, HIGH);
-    delay(ms);
-    digitalWrite(GATE_PIN, LOW);
-  }
+void Gate::openFor(long mks) {
+    if (mks <= MAX_MKS_DELAY) {
+        digitalWrite(GATE_PIN, HIGH);
+        delayMicroseconds(mks);
+        digitalWrite(GATE_PIN, LOW);
+    } else {
+        long ms = mks / 1000;
+        digitalWrite(GATE_PIN, HIGH);
+        delay(ms);
+        digitalWrite(GATE_PIN, LOW);
+    }
 };
 
-void Gate::waitFor(ulong mks) {
-  if (mks <= MAX_MKS_DELAY) delayMicroseconds(mks);
-  else delay(mks / 1000);
+void Gate::waitFor(long mks) {
+    if (mks <= MAX_MKS_DELAY) delayMicroseconds(mks);
+    else delay(mks / 1000);
 };
+
 
 void Gate::finishSequence() {
-  PWM_default(PIN_GATE);
-
-  isSequenceInProgress = false;
+    PWM_default(PIN_GATE);
+    if( Params::isContinous() ) {
+        isSequenceInProgress = false;
+    } else {
+        startCooldown();
+    }
 };
 
+long startCooldownTime;
+void Gate::startCooldown(){
+    Model::remainingCooldownTime = Params::cooldown;
+    startCooldownTime = millis();
+}
+
+void Gate::tick(){
+    if (Model::remainingCooldownTime > 0) Model::remainingCooldownTime = Params::cooldown - (millis() - startCooldownTime);
+
+    if( Model::remainingCooldownTime <= 0 ) {
+        isSequenceInProgress = false;
+    }
+
+}
 
 bool Gate::isActive() {
-  return isSequenceInProgress;
+    return isSequenceInProgress;
 };
 
-ulong Gate::meander(ulong freq){
-  meanderFrequency = PWM_square_D9((float)freq);
-  return meanderFrequency;
+long Gate::meander(long freq, bool test) {
+    long actualFreq = PWM_square_D9(float(freq));
+    if (test) PWM_default(PIN_GATE);
+    return long(actualFreq);
 }
 
 void Gate::startSequence() {
-  if (isSequenceInProgress) return;
+    if (isSequenceInProgress) return;
+    breakFlag = false;
 
-  isSequenceInProgress = true;
-  switch (Params::mode) {
-    case OneImpulse:
-      openFor(Params::impulseLength);
-      finishSequence();
-      return;
-    case DualImpulse:
-      openFor(Params::impulseLength);
-      waitFor(Params::impulseDelay);
-      openFor(Params::secondImpulseLength);
-      finishSequence();
-      return;
-    case TripleImpulse:
-      openFor(Params::impulseLength);
-      waitFor(Params::impulseDelay);
-      openFor(Params::secondImpulseLength);
-      waitFor(Params::secondImpulseDelay);
-      openFor(Params::thirdImpulseLength);
-      finishSequence();
-      return;
-    case Burst:
-      for (int i = 0; i < Params::burstLength; i++) {
-        openFor(Params::impulseLength);
-        waitFor(Params::impulseDelay);
-      }
-      finishSequence();
-      return;
-    case Meander:
-      meander(Params::frequency);
-      return;
-  }
+    isSequenceInProgress = true;
+    switch (Params::mode) {
+        case OneImpulse:
+            openFor(Params::impulseLength);
+            finishSequence();
+            return;
+        case DualImpulse:
+            openFor(Params::impulseLength);
+            waitFor(Params::impulseDelay);
+            openFor(Params::secondImpulseLength);
+            finishSequence();
+            return;
+        case TripleImpulse:
+            openFor(Params::impulseLength);
+            waitFor(Params::impulseDelay);
+            openFor(Params::secondImpulseLength);
+            waitFor(Params::secondImpulseDelay);
+            openFor(Params::thirdImpulseLength);
+            finishSequence();
+            return;
+        case Burst:
+            for (int i = 0; i < Params::burstLength || Params::burstLength == 0; i++) {
+                if (Gate::breakFlag) break;
+                openFor(Params::impulseLength);
+                waitFor(Params::impulseDelay);
+            }
+            finishSequence();
+            return;
+        case Meander:
+            meander(Params::frequency, false);
+            return;
+    }
 };
 
 void Gate::cancelSequence() {
-  finishSequence();
+    breakFlag = true;
+    finishSequence();
 };

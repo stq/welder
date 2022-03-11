@@ -2,5 +2,6 @@
 
 class Health {
 public:
-  static void check();
+    static void encoderTest();
+    static void check();
 };

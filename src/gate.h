@@ -5,20 +5,23 @@
 
 class Gate {
 public:
+    static bool breakFlag;
+
     static void open();
 
     static void close();
 
-    static void openFor(ulong mks);
+    static void openFor(long mks);
 
-    static void waitFor(ulong mks);
+    static void waitFor(long mks);
 
     static void finishSequence();
 
     static bool isSequenceInProgress;
-    static ulong meanderFrequency;
 
     static void init();
+    static void tick();
+    static void startCooldown();
 
     static void startSequence();
 
@@ -26,5 +29,5 @@ public:
 
     static void cancelSequence();
 
-    static ulong meander(ulong freq);
+    static long meander(long freq, bool test);
 };

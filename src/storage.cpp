@@ -6,18 +6,18 @@
 
 int Storage::position = 0;
 
-void Storage::from(int initialPosition){
-  position = initialPosition;
+void Storage::from(int initialPosition) {
+    position = initialPosition;
 };
 
-void Storage::read(ulong& value){
-  EEPROM.get(position, value);
-  position += sizeof(ulong);
+void Storage::read(long &value) {
+    EEPROM.get(position, value);
+    position += sizeof(long);
 };
 
-void Storage::write(ulong value){
-  ulong currentValue;
-  EEPROM.get(position, currentValue);
-  if (currentValue != value) EEPROM.put(position, value);
-  position += sizeof(ulong);
+void Storage::write(long value) {
+    long currentValue;
+    EEPROM.get(position, currentValue);
+    if (currentValue != value) EEPROM.put(position, value);
+    position += sizeof(long);
 };

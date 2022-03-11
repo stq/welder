@@ -1,8 +1,8 @@
 #pragma once
 
-#define MKS *1UL
-#define MS *1000UL
-#define S *1000000UL
+#define MKS *1L
+#define MS *1000L
+#define S *1000000L
 
 #define MEM_START 10
 
@@ -29,30 +29,36 @@ enum Property {
 class Params {
 
 private:
-  static void applyConstraints();
-  static bool isPropertyApplicable(Property prop);
+    static void applyConstraints();
+
+    static bool isPropertyApplicable(Property prop);
 
 public:
 
-  static ulong impulseLength;
-  static ulong impulseDelay;
-  static ulong secondImpulseLength;
-  static ulong secondImpulseDelay;
-  static ulong thirdImpulseLength;
-  static ulong burstImpulseLength;
-  static ulong burstImpulseDelay;
-  static ulong burstLength;
-  static ulong frequency;
-  static ulong cooldown;
-  static ulong contactDetectDelay;
-  static Mode  mode;
+    static long impulseLength;
+    static long impulseDelay;
+    static long secondImpulseLength;
+    static long secondImpulseDelay;
+    static long thirdImpulseLength;
+    static long burstImpulseLength;
+    static long burstImpulseDelay;
+    static long burstLength;
+    static long frequency;
+    static long cooldown;
+    static long contactDetectDelay;
+    static Mode mode;
 
-  static void init();
-  static Property getNextProperty(Property base, bool backward);
-  static void modify(Property property, int shift, ulong multiplier);
-  static void save();
-  static void load();
-  static bool isContinous();
-  static ulong getValue(Property prop);
-  static ulong getMaxMultiplier(Property);
+    static Property getNextProperty(Property base, bool backward);
+
+    static void modify(Property property, int shift, int multiplier);
+
+    static void save();
+
+    static void load();
+
+    static bool isContinous();
+
+    static long getValue(Property prop);
+
+    static bool isWeldingMode();
 };

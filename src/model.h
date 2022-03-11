@@ -1,21 +1,23 @@
 #pragma once
+
 #include "params.h"
 
 class Model {
 public:
     static Property property;
 
+    static int multiplierLog10;
 
-    static ulong multiplier;
-
-    static bool isContacted;
     static bool isAutoCountdown;
-    static ulong startAutoCountdownTime;
-    static ulong remainingAutoCountdownTime;
+    static bool saving;
+    static bool loading;
+    static long startAutoCountdownTime;
+    static long remainingAutoCountdownTime;
 
-    static ulong remainingCooldownTime;
+    static long remainingCooldownTime;
 
     static void chooseNextProperty();
+
     static void choosePrevProperty();
 
     static void debug();
