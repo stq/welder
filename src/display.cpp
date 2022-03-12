@@ -4,9 +4,8 @@
 #include "display.h"
 
 LiquidCrystal *lcd;
-char buff1[17];
-char buff2[17];
-char *db[] = {buff1, buff2};
+char buff1[16];
+char buff2[16];
 bool changed = true;
 bool blinks = false;
 int blinkX = 0;
@@ -30,53 +29,54 @@ void Display::init() {
     lcd->setCursor(0, 1);
     lcd->print("initialization..");
     delay(1000);
-    lcd->setCursor(0, 0);
-    lcd->print("...");
-    lcd->setCursor(0, 1);
-    lcd->print("...");
-    delay(100);
 }
 
 void Display::print(int x, int y, char ch) {
     if( x > 15 || y > 1 ) return;
-    if (db[y][x] != ch) {
-        db[y][x] = ch;
+    char* buff = y == 0 ? buff1 : buff2;
+
+    if (buff[x] != ch) {
+        buff[x] = ch;
         changed = true;
     }
 }
 
 void Display::print(int line, char *text) {
-    for (int i = 1; i <= 15; i++) db[line][i] = 0;
+    int len = strlen(text);
+    if( len > 15 ) { Serial.println("ERROR");Serial.println(text); }
 
-    int size = min(strlen (text), 15);
-    int start = 16 - size;
+    char* buff = line == 0 ? buff1 : buff2;
 
-    for (int i = 0; i <= size; i++) {
-        char c = text[i] != '#' ? text[i] : char(3);
-        if (db[line][start + i] != c) {
-            db[line][start + i] = c;
-            changed = true;
-        }
+    int start = 16 - len;
+    for (int i = 1; i < start; i++) {
+        if( buff[i] == ' ' ) continue;
+        buff[i] = ' ';
+        changed = true;
+    }
+
+    for (int i = start; i < 16; i++) {
+        char c = text[i-start];
+        if( c == '#' ) c = char(3);
+        if( buff[i] == c ) continue;
+        buff[i] = c;
+        changed = true;
     }
 }
 
 void Display::tick() {
     if (changed) {
+        lcd->setCursor(0, 0);
+        lcd->print(buff1);
+        lcd->setCursor(0, 1);
+        lcd->print(buff2);
 
-        for( int i = 0; i < 16; i ++ ){
-            lcd->setCursor(i, 0);
-            lcd->write(buff1[i] == 0 ? ' ' : buff1[i]);
-            lcd->setCursor(i, 1);
-            lcd->write(buff2[i] == 0 ? ' ' : buff2[i]);
-        }
-
-        changed = false;
         if (blinks) {
             lcd->setCursor(blinkX, blinkY);
             lcd->blink();
         } else lcd->noBlink();
-    }
 
+        changed = false;
+    }
 }
 
 void Display::blink(int x, int y) {
