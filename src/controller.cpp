@@ -47,6 +47,8 @@ void Controller::init() {
     pinMode(PIN_AUX_ENCODER_B, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(PIN_AUX_ENCODER_B), updateEnc, CHANGE);
     attachInterrupt(digitalPinToInterrupt(PIN_IMPULSE_BTN), cancelGateSequence, CHANGE);
+    leftButton.setType(LOW_PULL);
+    rightButton.setType(LOW_PULL);
 };
 
 void changeMode(int shift) {
@@ -99,9 +101,11 @@ void Controller::tick() {
             Speaker::play(1000, 500);
             Params::save();
         }
-        if( leftButtonPressed && rightButtonPressed ) {
+
+        if( rightButton.isHold() && leftButton.isHold() ) {
             Speaker::midi();
-            Model::fuse = false;
+            delay(1000);
+            Model::fuse = !Model::fuse;
         }
     } else {
         if (leftButtonPressed) Model::choosePrevProperty();
@@ -121,7 +125,7 @@ void Controller::tick() {
             if (!Sensor::isContacted) {
                 Model::isAutoCountdown = false;
             } else {
-                Model::remainingAutoCountdownTime = Params::contactDetectDelay - (millis() - Model::startAutoCountdownTime);
+                Model::remainingAutoCountdownTime = Params::contactDetectDelay/1000 - (millis() - Model::startAutoCountdownTime);
                 if (Model::remainingAutoCountdownTime <= 0) {
                     Gate::startSequence();
                     Model::isAutoCountdown = false;

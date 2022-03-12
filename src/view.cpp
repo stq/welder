@@ -37,7 +37,7 @@ void renderPropertyName() {
             Display::print(0, "Frequency");
             return;
         case Cooldown:
-            Display::print(0, " Cooldown time");
+            Display::print(0, "Cooldown time");
             return;
         case ContactDetectDelay:
             Display::print(0, "Auto wait time");
@@ -47,16 +47,16 @@ void renderPropertyName() {
 
 char buffer[16];
 void renderAutoCountdown() {
-    Display::print(0, "Contact detected");
+    Display::print(0, "Contact detect");
     int decimals = (Model::remainingAutoCountdownTime % 1000) / 100;
-    sprintf(buffer, "Impulse in %l.%ls", Model::remainingAutoCountdownTime / 1000, decimals);
+    sprintf(buffer, "Impulse in %d.%ds", int(Model::remainingAutoCountdownTime / 1000), decimals);
     Display::print(1, buffer);
     if (decimals % 2 == 0) Speaker::play(1000, 100);
 }
 
 void renderCooldown() {
     Display::print(0, "Cooldown...");
-    sprintf(buffer, "Ends in %l.%ls", Model::remainingCooldownTime / 1000, (Model::remainingCooldownTime % 1000) / 100);
+    sprintf(buffer, "Ends in:%d.%ds", int(Model::remainingCooldownTime / 1000), int(Model::remainingCooldownTime % 1000) / 100);
     Display::print(1,  buffer);
     if (Model::remainingCooldownTime < 100) Speaker::play(2000, 100);
 }
@@ -89,7 +89,7 @@ void renderGateActive() {
 
 void View::tick() {
 
-    if( Gate::isActive() ) {
+    if( Gate::isActive() && Model::remainingCooldownTime <= 0) {
         Display::print(0, 0, Params::isWeldingMode() ? char(1) : char(2));
         Display::print(0, 1, modes[int(Params::mode)]);
         renderGateActive();

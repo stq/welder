@@ -41,6 +41,7 @@ void Gate::waitFor(long mks) {
 
 
 void Gate::finishSequence() {
+    Serial.println("finishSequence");
     PWM_default(PIN_GATE);
     if( Params::isContinous() ) {
         isSequenceInProgress = false;
@@ -51,14 +52,22 @@ void Gate::finishSequence() {
 
 long startCooldownTime;
 void Gate::startCooldown(){
-    Model::remainingCooldownTime = Params::cooldown;
+    Serial.println("finishSequence");
+
+    Model::remainingCooldownTime = Params::cooldown/1000;
     startCooldownTime = millis();
 }
 
 void Gate::tick(){
-    if (Model::remainingCooldownTime > 0) Model::remainingCooldownTime = Params::cooldown - (millis() - startCooldownTime);
+    if (Model::remainingCooldownTime > 0) {
+        Serial.println("remainingCooldownTime > 0");
 
-    if( Model::remainingCooldownTime <= 0 ) {
+        Model::remainingCooldownTime = Params::cooldown/1000 - (millis() - startCooldownTime);
+        Serial.println(Model::remainingCooldownTime);
+    }
+
+    if( isSequenceInProgress && Model::remainingCooldownTime <= 0 ) {
+        Serial.println("isSequenceInProgress = false");
         isSequenceInProgress = false;
     }
 
