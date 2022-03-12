@@ -82,11 +82,8 @@ void Controller::tick() {
     }
 
     if( Gate::isActive() ) {
-        Serial.println("GateActive");
         return;
     }
-
-    if( turnsLocal != 0 ) Serial.println(turnsLocal);
 
     if (impulseButtonPressed) Speaker::play(1000, 100);
     if (leftButtonPressed) Speaker::play(500 + (altButtonPressed ? 1000 : 0), 25);
@@ -102,6 +99,10 @@ void Controller::tick() {
             Speaker::play(1000, 500);
             Params::save();
         }
+        if( leftButtonPressed && rightButtonPressed ) {
+            Speaker::midi();
+            Model::fuse = false;
+        }
     } else {
         if (leftButtonPressed) Model::choosePrevProperty();
         else if (rightButtonPressed) Model::chooseNextProperty();
@@ -113,8 +114,6 @@ void Controller::tick() {
     }
 
     Sensor::tick();
-
-    if( Sensor::isContacted ) Serial.println("Detected contact");
 
     if (Params::isWeldingMode()) {
 

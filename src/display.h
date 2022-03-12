@@ -10,7 +10,7 @@ public:
 
     static void tick();
 
-    static void print(int x, int y, int length, char *text);
+    static void print(int line, char *text);
 
     static void print(int x, int y, char ch);
 

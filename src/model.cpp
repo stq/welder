@@ -6,6 +6,7 @@
 Property  Model::property = Cooldown;
 
 int      Model::multiplierLog10 = 1;
+bool     Model::fuse = true;
 
 bool     Model::isAutoCountdown = false;
 long     Model::startAutoCountdownTime = 0L;

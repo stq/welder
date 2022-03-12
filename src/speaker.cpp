@@ -2,7 +2,7 @@
 #include "pins.h"
 #include "speaker.h"
 
-void midi() {
+void Speaker::midi() {
     int tonePin = PIN_SPEAKER;
     tone(tonePin, 493, 53.0660625);
     delay(58.9622916667);
@@ -92,7 +92,6 @@ void midi() {
 
 void Speaker::init() {
     pinMode(PIN_SPEAKER, OUTPUT);
-    if( random(100) == 1 ) midi();
 };
 
 void Speaker::play(int f, int t) {

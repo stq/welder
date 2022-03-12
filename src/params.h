@@ -29,11 +29,11 @@ enum Property {
 class Params {
 
 private:
-    static void applyConstraints();
 
     static bool isPropertyApplicable(Property prop);
 
 public:
+    static void applyConstraints();
 
     static long impulseLength;
     static long impulseDelay;

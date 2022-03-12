@@ -15,13 +15,10 @@ void Sensor::analyzeReadings(){
     }
     int disp = max - min;
     isContacted =  disp < 30 && readings[4] > 200;
-
-    if( isContacted ) Serial.println("Contacted");
 }
 
 void Sensor::tick(){
     int value = analogRead(PIN_CONTACT_SENSOR);
-    if( value > 0 ) Serial.println(value);
 
     readings[readingsIndex++] = value;
 

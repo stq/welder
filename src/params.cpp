@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "global.h"
+#include "model.h"
 #include "params.h"
 #include "storage.h"
 #include "gate.h"
@@ -93,8 +94,8 @@ Property Params::getNextProperty(Property base, bool backward) {
     }
 };
 
-long modifyInterval(long val, int shift, long multiplier) {
-    return constrain(val + multiplier * shift, 1 MKS, 9 S);
+long modifyInterval(long val, int shift, long multiplier, long minVal, long maxVal) {
+    return constrain(val + multiplier * shift, minVal, maxVal);
 };
 
 long modifyFrequency(long freq, int shift, long multiplier) {
@@ -126,23 +127,26 @@ long pow10(int n){
 
 void Params::modify(Property property, int shift, int multiplierLog10) {
     long multiplier = pow10(multiplierLog10-1);
-
+    long minVal =  1 MKS;
+    long maxImpulseVal =  Model::fuse ? 30 MS : 9 S;
+    long maxDelayVal =  Model::fuse ? 200 MS : 9 S;
+    long minCdDelayVal =  Model::fuse ? 1 S : 1 MS;
     switch (property) {
         case ImpulseLength:
-            impulseLength = modifyInterval(impulseLength, shift, multiplier);
+            impulseLength = modifyInterval(impulseLength, shift, multiplier, minVal, maxImpulseVal);
             return;
         case SecondImpulseLength:
-            secondImpulseLength = modifyInterval(secondImpulseLength, shift, multiplier);
+            secondImpulseLength = modifyInterval(secondImpulseLength, shift, multiplier, minVal, maxImpulseVal);
             return;
         case ThirdImpulseLength:
-            thirdImpulseLength = modifyInterval(thirdImpulseLength, shift, multiplier);
+            thirdImpulseLength = modifyInterval(thirdImpulseLength, shift, multiplier, minVal, maxImpulseVal);
             return;
 
         case ImpulseDelay:
-            impulseDelay = modifyInterval(impulseDelay, shift, multiplier);
+            impulseDelay = modifyInterval(impulseDelay, shift, multiplier, minVal, maxDelayVal);
             return;
         case SecondImpulseDelay:
-            secondImpulseDelay = modifyInterval(secondImpulseDelay, shift, multiplier);
+            secondImpulseDelay = modifyInterval(secondImpulseDelay, shift, multiplier, minVal, maxDelayVal);
             return;
 
         case Frequency:
@@ -150,10 +154,10 @@ void Params::modify(Property property, int shift, int multiplierLog10) {
             return;
 
         case BurstImpulseLength:
-            burstImpulseLength = modifyInterval(burstImpulseLength, shift, multiplier);
+            burstImpulseLength = modifyInterval(burstImpulseLength, shift, multiplier, minVal, maxImpulseVal);
             return;
         case BurstImpulseDelay:
-            burstImpulseDelay = modifyInterval(burstImpulseDelay, shift, multiplier);
+            burstImpulseDelay = modifyInterval(burstImpulseDelay, shift, multiplier, minVal, maxDelayVal);
             return;
 
         case BurstLength:
@@ -161,11 +165,11 @@ void Params::modify(Property property, int shift, int multiplierLog10) {
             return;
 
         case Cooldown:
-            cooldown = modifyInterval(cooldown, shift, multiplier);
+            cooldown = modifyInterval(cooldown, shift, multiplier, minCdDelayVal, 9 S);
             return;
 
         case ContactDetectDelay:
-            contactDetectDelay = modifyInterval(contactDetectDelay, shift, multiplier);
+            contactDetectDelay = modifyInterval(contactDetectDelay, shift, multiplier, minCdDelayVal, 9 S);
             return;
     }
 };

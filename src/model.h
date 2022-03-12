@@ -7,6 +7,7 @@ public:
     static Property property;
 
     static int multiplierLog10;
+    static bool fuse;
 
     static bool isAutoCountdown;
     static bool saving;

@@ -4,8 +4,8 @@
 #include "display.h"
 
 LiquidCrystal *lcd;
-char buff1[16];
-char buff2[16];
+char buff1[17];
+char buff2[17];
 char *db[] = {buff1, buff2};
 bool changed = true;
 bool blinks = false;
@@ -30,6 +30,11 @@ void Display::init() {
     lcd->setCursor(0, 1);
     lcd->print("initialization..");
     delay(1000);
+    lcd->setCursor(0, 0);
+    lcd->print("...");
+    lcd->setCursor(0, 1);
+    lcd->print("...");
+    delay(100);
 }
 
 void Display::print(int x, int y, char ch) {
@@ -40,20 +45,24 @@ void Display::print(int x, int y, char ch) {
     }
 }
 
-void Display::print(int x, int y, int length, char *text) {
-    for (int i = 0; i < length && (x+i) < 16; i++) {
-        char c = text[i] != '#' ? text[i] : char(3);
-        if (db[y][x + i] != c) {
-            db[y][x + i] = c;
-            changed = true;
+void Display::print(int line, char *text) {
+    for (int i = 1; i <= 15; i++) db[line][i] = 0;
 
+    int size = min(strlen (text), 15);
+    int start = 16 - size;
+
+    for (int i = 0; i <= size; i++) {
+        char c = text[i] != '#' ? text[i] : char(3);
+        if (db[line][start + i] != c) {
+            db[line][start + i] = c;
+            changed = true;
         }
     }
-
 }
 
 void Display::tick() {
     if (changed) {
+
         for( int i = 0; i < 16; i ++ ){
             lcd->setCursor(i, 0);
             lcd->write(buff1[i] == 0 ? ' ' : buff1[i]);

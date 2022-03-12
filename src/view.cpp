@@ -10,54 +10,54 @@
 void renderPropertyName() {
     switch (Model::property) {
         case ImpulseLength:
-            Display::print(1, 0, 15, "     Length: #1");
+            Display::print(0, "Length: #1");
             return;
         case ImpulseDelay:
-            Display::print(1, 0, 15, "  Pause: #1..#2");
+            Display::print(0, "Pause: #1..#2");
             return;
         case SecondImpulseLength:
-            Display::print(1, 0, 15, "     Length: #2");
+            Display::print(0, "Length: #2");
             return;
         case SecondImpulseDelay:
-            Display::print(1, 0, 15, "  Pause: #2..#3");
+            Display::print(0, "Pause: #2..#3");
             return;
         case ThirdImpulseLength:
-            Display::print(1, 0, 15, "     Length: #3");
+            Display::print(0, "Length: #3");
             return;
         case BurstImpulseLength:
-            Display::print(1, 0, 15, "     Length: On");
+            Display::print(0, "Length: On");
             return;
         case BurstImpulseDelay:
-            Display::print(1, 0, 15, "    Length: Off");
+            Display::print(0, "Length: Off");
             return;
         case BurstLength:
-            Display::print(1, 0, 15, "        Repeats");
+            Display::print(0, "Repeats");
             return;
         case Frequency:
-            Display::print(1, 0, 15, "      Frequency");
+            Display::print(0, "Frequency");
             return;
         case Cooldown:
-            Display::print(1, 0, 15, " Cooldown time");
+            Display::print(0, " Cooldown time");
             return;
         case ContactDetectDelay:
-            Display::print(1, 0, 15, "Auto wait time");
+            Display::print(0, "Auto wait time");
             return;
     }
 };
 
 char buffer[16];
 void renderAutoCountdown() {
-    Display::print(0, 0, 16, "Contact detected");
+    Display::print(0, "Contact detected");
     int decimals = (Model::remainingAutoCountdownTime % 1000) / 100;
-    sprintf(buffer, "Impulse in %l.%ls ", Model::remainingAutoCountdownTime / 1000, decimals);
-    Display::print(0, 1, 16, buffer);
+    sprintf(buffer, "Impulse in %l.%ls", Model::remainingAutoCountdownTime / 1000, decimals);
+    Display::print(1, buffer);
     if (decimals % 2 == 0) Speaker::play(1000, 100);
 }
 
 void renderCooldown() {
-    Display::print(0, 0, 16, "Cooldown...    ");
-    sprintf(buffer, " Ends in %l.%ls...", Model::remainingCooldownTime / 1000, (Model::remainingCooldownTime % 1000) / 100);
-    Display::print(0, 1, 16, buffer);
+    Display::print(0, "Cooldown...");
+    sprintf(buffer, "Ends in %l.%ls", Model::remainingCooldownTime / 1000, (Model::remainingCooldownTime % 1000) / 100);
+    Display::print(1,  buffer);
     if (Model::remainingCooldownTime < 100) Speaker::play(2000, 100);
 }
 
@@ -83,8 +83,8 @@ char *getPropertyMetric() {
 char modes[] = {'1', '2', '3', char(3), 'M'};
 
 void renderGateActive() {
-    Display::print(1, 0, 15, " Gate is active");
-    Display::print(1, 1, 15, "               ");
+    Display::print(0, "Gate is active");
+    Display::print(1, "");
 }
 
 void View::tick() {
@@ -102,10 +102,10 @@ void View::tick() {
         Display::print(0, 1, modes[int(Params::mode)]);
         renderPropertyName();
         if (Model::property == BurstLength && Params::burstLength == 0) {
-            Display::print(1, 1, " till cancelled");
+            Display::print(1, "till cancelled");
         } else {
             sprintf(buffer, "  %7lu %s  ", Params::getValue(Model::property), getPropertyMetric());
-            Display::print(1, 1, 15, buffer);
+            Display::print(1, buffer);
             Display::blink(10 - Model::multiplierLog10, 1);
         }
     }

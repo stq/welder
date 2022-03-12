@@ -8,7 +8,6 @@ void Health::encoderTest() {
     pinMode(PIN_AUX_ENCODER_A, INPUT);
     pinMode(PIN_AUX_ENCODER_B, INPUT);
     Encoder enc(PIN_AUX_ENCODER_A, PIN_AUX_ENCODER_B);
-//    enc.setType(TYPE2);
     while (Serial.available() == 0) {
         enc.tick();
         if (enc.isRight()) Serial.println("Right");
