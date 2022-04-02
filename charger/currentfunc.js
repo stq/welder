@@ -40,7 +40,7 @@ var data = [{c: 473, r: 2.97},
 var min = 10000000000;
 
 
-    for (var A = 513; A < 518; A += 1) {
+for (var A = 513; A < 518; A += 1) {
     for (var B = 0.06; B < 0.08; B += 0.0001) {
 
         var f = c => (A - c) * B;
@@ -55,7 +55,7 @@ var min = 10000000000;
             console.log("Best", A, B);
         }
     }
-    }
+}
 
 
 //514 0.0715
