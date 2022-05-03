@@ -8,8 +8,6 @@
 long Params::impulseLength;
 long Params::impulseDelay;
 long Params::secondImpulseLength;
-long Params::secondImpulseDelay;
-long Params::thirdImpulseLength;
 long Params::burstImpulseLength;
 long Params::burstImpulseDelay;
 long Params::burstLength;
@@ -24,9 +22,8 @@ bool Params::isPropertyApplicable(Property prop) {
     if (mode == Meander && prop == Frequency) return true;
     if (mode == Burst && (prop == BurstImpulseLength || prop == BurstImpulseDelay || prop == BurstLength)) return true;
 
-    if ((mode == TripleImpulse || mode == DualImpulse || mode == OneImpulse) && (prop == ImpulseLength || prop == ContactDetectDelay || prop == Cooldown)) return true;
-    if ((mode == TripleImpulse || mode == DualImpulse) && (prop == ImpulseDelay || prop == SecondImpulseLength)) return true;
-    if (mode == TripleImpulse && (prop == SecondImpulseDelay || prop == ThirdImpulseLength)) return true;
+    if (( mode == DualImpulse || mode == OneImpulse) && (prop == ImpulseLength || prop == ContactDetectDelay || prop == Cooldown)) return true;
+    if (( mode == DualImpulse) && (prop == ImpulseDelay || prop == SecondImpulseLength)) return true;
 
     return false;
 };
@@ -35,8 +32,6 @@ void Params::applyConstraints() {
     modify(ImpulseLength, 0, 1);
     modify(ImpulseDelay, 0, 1);
     modify(SecondImpulseLength, 0, 1);
-    modify(SecondImpulseDelay, 0, 1);
-    modify(ThirdImpulseLength, 0, 1);
     modify(BurstImpulseLength, 0, 1);
     modify(BurstImpulseDelay, 0, 1);
     modify(BurstLength, 0, 1);
@@ -51,8 +46,6 @@ void Params::load() {
     Storage::read(impulseLength);
     Storage::read(impulseDelay);
     Storage::read(secondImpulseLength);
-    Storage::read(secondImpulseDelay);
-    Storage::read(thirdImpulseLength);
     Storage::read(burstImpulseLength);
     Storage::read(burstImpulseDelay);
     Storage::read(burstLength);
@@ -70,8 +63,6 @@ void Params::save() {
     Storage::write(impulseLength);
     Storage::write(impulseDelay);
     Storage::write(secondImpulseLength);
-    Storage::write(secondImpulseDelay);
-    Storage::write(thirdImpulseLength);
     Storage::write(burstImpulseLength);
     Storage::write(burstImpulseDelay);
     Storage::write(burstLength);
@@ -138,15 +129,9 @@ void Params::modify(Property property, int shift, int multiplierLog10) {
         case SecondImpulseLength:
             secondImpulseLength = modifyInterval(secondImpulseLength, shift, multiplier, minVal, maxImpulseVal);
             return;
-        case ThirdImpulseLength:
-            thirdImpulseLength = modifyInterval(thirdImpulseLength, shift, multiplier, minVal, maxImpulseVal);
-            return;
 
         case ImpulseDelay:
             impulseDelay = modifyInterval(impulseDelay, shift, multiplier, minVal, maxDelayVal);
-            return;
-        case SecondImpulseDelay:
-            secondImpulseDelay = modifyInterval(secondImpulseDelay, shift, multiplier, minVal, maxDelayVal);
             return;
 
         case Frequency:
@@ -183,10 +168,6 @@ long Params::getValue(Property prop) {
             return Params::impulseLength;
         case SecondImpulseLength:
             return Params::secondImpulseLength;
-        case SecondImpulseDelay:
-            return Params::secondImpulseDelay;
-        case ThirdImpulseLength:
-            return Params::thirdImpulseLength;
         case BurstImpulseLength:
             return Params::burstImpulseLength;
         case BurstImpulseDelay:
@@ -203,5 +184,5 @@ long Params::getValue(Property prop) {
 };
 
 bool Params::isWeldingMode() {
-    return mode == OneImpulse || mode == DualImpulse || mode == TripleImpulse;
+    return mode == OneImpulse || mode == DualImpulse;
 }

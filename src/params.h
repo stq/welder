@@ -7,16 +7,14 @@
 #define MEM_START 10
 
 enum Mode {
-    OneImpulse, DualImpulse, TripleImpulse, Burst, Meander
+    OneImpulse, DualImpulse, Burst, Meander
 };
-#define MODES_AMOUNT 5
+#define MODES_AMOUNT 4
 
 enum Property {
     ImpulseLength,
     ImpulseDelay,
     SecondImpulseLength,
-    SecondImpulseDelay,
-    ThirdImpulseLength,
     BurstImpulseLength,
     BurstImpulseDelay,
     BurstLength,
@@ -38,8 +36,6 @@ public:
     static long impulseLength;
     static long impulseDelay;
     static long secondImpulseLength;
-    static long secondImpulseDelay;
-    static long thirdImpulseLength;
     static long burstImpulseLength;
     static long burstImpulseDelay;
     static long burstLength;

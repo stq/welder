@@ -18,12 +18,6 @@ void renderPropertyName() {
         case SecondImpulseLength:
             Display::print(0, "Length: #2");
             return;
-        case SecondImpulseDelay:
-            Display::print(0, "Pause: #2..#3");
-            return;
-        case ThirdImpulseLength:
-            Display::print(0, "Length: #3");
-            return;
         case BurstImpulseLength:
             Display::print(0, "Length: On");
             return;
@@ -66,8 +60,6 @@ char *getPropertyMetric() {
         case ImpulseLength:
         case ImpulseDelay:
         case SecondImpulseLength:
-        case SecondImpulseDelay:
-        case ThirdImpulseLength:
         case BurstImpulseLength:
         case BurstImpulseDelay:
         case Cooldown:

@@ -99,14 +99,6 @@ void Gate::startSequence() {
             openFor(Params::secondImpulseLength);
             finishSequence();
             return;
-        case TripleImpulse:
-            openFor(Params::impulseLength);
-            waitFor(Params::impulseDelay);
-            openFor(Params::secondImpulseLength);
-            waitFor(Params::secondImpulseDelay);
-            openFor(Params::thirdImpulseLength);
-            finishSequence();
-            return;
         case Burst:
             for (int i = 0; i < Params::burstLength || Params::burstLength == 0; i++) {
                 if (Gate::breakFlag) break;
